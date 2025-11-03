@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DGA Project Approval System</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        
+        .project-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .timeline-icon {
+            position: absolute;
+            left: -23px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        
+        .timeline-icon.success {
+            background: #198754;
+            border-color: #198754;
+            color: white;
+        }
+        
+        .timeline-icon.pending {
+            background: #ffc107;
+            border-color: #ffc107;
+            color: white;
+        }
+        
+        .timeline-icon.rejected {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        
+        .detail-view {
+            display: none;
+        }
+        
+        .detail-view.active {
+            display: block;
+        }
+        
+        .list-view.hidden {
+            display: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            color: #212529;
+            margin-bottom: 1rem;
+        }
+        
+        .approval-actions {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1.5rem;
+            border-top: 2px solid #dee2e6;
+            margin: -1rem -1rem 0 -1rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-light bg-white shadow-sm">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-clipboard-check-fill text-primary"></i>
+                ระบบอนุมัติโครงการ DGA
+            </span>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-warning text-dark">
+                    <i class="bi bi-hourglass-split"></i>
+                    รออนุมัติ: <span id="pending-count">0</span>
+                </span>
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                        ผู้ดูแลระบบ
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> ตั้งค่า</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i> ออกจากระบบ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid my-4">
+        <div class="row">
+            <!-- Sidebar Filter -->
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-funnel-fill"></i>
+                            ตัวกรอง
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">สถานะ</label>
+                            <div class="form-check">
+                                <input class="form-check-input filter-status" type="checkbox" value="pending" id="filter-pending" checked>
+                                <label class="form-check-label" for="filter-pending">
+                                    รออนุมัติ
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input filter-status" type="checkbox" value="approved" id="filter-approved">
+                                <label class="form-check-label" for="filter-approved">
+                                    อนุมัติแล้ว
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input filter-status" type="checkbox" value="rejected" id="filter-rejected">
+                                <label class="form-check-label" for="filter-rejected">
+                                    ไม่อนุมัติ
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">โมเดลการสนับสนุน</label>
+                            <select class="form-select form-select-sm" id="filter-support-model">
+                                <option value="">ทั้งหมด</option>
+                                <option value="full-itc">Full ITC</option>
+                                <option value="hybrid-itc-infra">Hybrid (ITC-Infra)</option>
+                                <option value="full-vendor">Full Vendor Managed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">สภาพแวดล้อม</label>
+                            <select class="form-select form-select-sm" id="filter-environment">
+                                <option value="">ทั้งหมด</option>
+                                <option value="dev">Development</option>
+                                <option value="staging">Staging</option>
+                                <option value="prod">Production</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-outline-secondary btn-sm w-100" id="clear-filters">
+                            <i class="bi bi-x-circle"></i>
+                            ล้างตัวกรอง
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card shadow-sm border-0 mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="bi bi-info-circle-fill text-info"></i>
+                            สถิติ
+                        </h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>รออนุมัติ:</span>
+                            <strong class="text-warning" id="stats-pending">0</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>อนุมัติแล้ว:</span>
+                            <strong class="text-success" id="stats-approved">0</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>ไม่อนุมัติ:</span>
+                            <strong class="text-danger" id="stats-rejected">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-md-9">
+                
+                <!-- List View -->
+                <div class="list-view">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>
+                            <i class="bi bi-list-ul"></i>
+                            คำขอทั้งหมด
+                        </h4>
+                        <div class="input-group" style="max-width: 300px;">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="search-input" placeholder="ค้นหาโครงการ...">
+                        </div>
+                    </div>
+                    
+                    <div id="projects-list">
+                        <!-- Projects will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Detail View -->
+                <div class="detail-view" id="detail-view">
+                    <div class="mb-3">
+                        <button class="btn btn-outline-secondary" id="back-to-list">
+                            <i class="bi bi-arrow-left"></i>
+                            กลับไปรายการ
+                        </button>
+                    </div>
+                    
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div>
+                                    <h3 id="detail-project-name">ชื่อโครงการ</h3>
+                                    <p class="text-muted mb-0">
+                                        <i class="bi bi-calendar3"></i>
+                                        วันที่ส่งคำขอ: <span id="detail-submit-date">-</span>
+                                    </p>
+                                </div>
+                                <span id="detail-status" class="status-badge status-pending">รออนุมัติ</span>
+                            </div>
+
+                            <hr>
+
+                            <!-- Business Information -->
+                            <h5 class="mb-3">
+                                <i class="bi bi-briefcase-fill text-primary"></i>
+                                ข้อมูลโครงการ (Business Approval)
+                            </h5>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="info-label">รหัสโครงการ / Cost Center</div>
+                                    <div class="info-value" id="detail-cost-center">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-label">Project Manager</div>
+                                    <div class="info-value" id="detail-project-manager">-</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="info-label">คำอธิบายโครงการ (Business Objective)</div>
+                                <div class="info-value" id="detail-description">-</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="info-label">สภาพแวดล้อมที่ต้องการ</div>
+                                <div id="detail-environments">-</div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Technical Information -->
+                            <h5 class="mb-3">
+                                <i class="bi bi-gear-fill text-primary"></i>
+                                ข้อมูลเทคนิค (Technical Approval)
+                            </h5>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="info-label">ข้อมูล Vendor</div>
+                                    <div class="info-value" id="detail-vendor">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-label">ไฟล์สถาปัตยกรรม</div>
+                                    <div class="info-value">
+                                        <a href="#" id="detail-architecture-file" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-download"></i>
+                                            ดาวน์โหลด
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="info-label">คำอธิบายสถาปัตยกรรม</div>
+                                <div class="info-value" id="detail-architecture-desc">-</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="info-label">โมเดลการสนับสนุนที่ร้องขอ</div>
+                                <div class="info-value">
+                                    <span class="badge bg-info text-dark" id="detail-support-model">-</span>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <!-- Timeline -->
+                            <h5 class="mb-3">
+                                <i class="bi bi-clock-history text-primary"></i>
+                                ประวัติการดำเนินการ
+                            </h5>
+
+                            <div class="timeline" id="detail-timeline">
+                                <!-- Timeline items will be inserted here -->
+                            </div>
+
+                            <!-- Comments Section -->
+                            <div class="mt-4" id="comments-section">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-chat-left-text-fill text-primary"></i>
+                                    ความคิดเห็น
+                                </h5>
+                                <div id="comments-list" class="mb-3">
+                                    <!-- Comments will be inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- Approval Actions (only for pending requests) -->
+                            <div class="approval-actions" id="approval-actions" style="display: none;">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-pencil-square text-primary"></i>
+                                    การพิจารณา
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="approval-comment" class="form-label fw-bold">ความคิดเห็น / หมายเหตุ</label>
+                                    <textarea class="form-control" id="approval-comment" rows="3" placeholder="กรอกความคิดเห็นหรือหมายเหตุเพิ่มเติม..."></textarea>
+                                </div>
+
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button class="btn btn-danger" id="btn-reject">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        ไม่อนุมัติ
+                                    </button>
+                                    <button class="btn btn-success" id="btn-approve">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        อนุมัติ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <!-- Approval Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalTitle">ยืนยันการดำเนินการ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmModalBody">
+                    คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="confirmAction">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sample data for demonstration
+        let projects = [
+            {
+                id: 1,
+                projectName: "ระบบบริการประชาชนออนไลน์",
+                costCenter: "CC-2024-001",
+                projectManager: "นายสมชาย ใจดี",
+                description: "พัฒนาระบบให้บริการประชาชนผ่านช่องทางออนไลน์ เพื่อเพิ่มความสะดวกในการเข้าถึงบริการภาครัฐ",
+                environments: ["dev", "staging", "prod"],
+                vendor: "ABC Technology Co., Ltd.",
+                architectureFile: "architecture-diagram.pdf",
+                architectureDesc: "ใช้ ECS Fargate สำหรับ Application, RDS PostgreSQL สำหรับ Database, S3 สำหรับ Static Files, CloudFront สำหรับ CDN",
+                supportModel: "full-itc",
+                supportModelLabel: "Full ITC (ITC-Infra & Platform)",
+                status: "pending",
+                submitDate: "2024-10-15",
+                timeline: [
+                    { date: "2024-10-15 10:30", action: "ส่งคำขอโครงการ", status: "success", user: "นายสมชาย ใจดี" }
+                ],
+                comments: []
+            },
+            {
+                id: 2,
+                projectName: "ระบบคลังข้อมูลกลาง",
+                costCenter: "CC-2024-002",
+                projectManager: "นางสาวสมหญิง รักงาน",
+                description: "สร้างระบบคลังข้อมูลกลางสำหรับรวบรวมและวิเคราะห์ข้อมูลจากหลายหน่วยงาน",
+                environments: ["prod"],
+                vendor: "XYZ Solutions Ltd.",
+                architectureFile: "data-warehouse-arch.pdf",
+                architectureDesc: "ใช้ Redshift สำหรับ Data Warehouse, Glue สำหรับ ETL, Lambda สำหรับ Data Processing",
+                supportModel: "hybrid-itc-infra",
+                supportModelLabel: "Hybrid (ITC-Infra)",
+                status: "approved",
+                submitDate: "2024-10-10",
+                timeline: [
+                    { date: "2024-10-10 09:15", action: "ส่งคำขอโครงการ", status: "success", user: "นางสาวสมหญิง รักงาน" },
+                    { date: "2024-10-12 14:20", action: "ผู้ดูแลระบบอนุมัติ", status: "success", user: "Admin User", comment: "โครงการมีความพร้อมและสอดคล้องกับนโยบาย" }
+                ],
+                comments: [
+                    { date: "2024-10-12 14:20", user: "Admin User", text: "โครงการมีความพร้อมและสอดคล้องกับนโยบาย" }
+                ]
+            },
+            {
+                id: 3,
+                projectName: "แอปพลิเคชันตรวจสอบสถานะ",
+                costCenter: "CC-2024-003",
+                projectManager: "นายสมศักดิ์ ทำดี",
+                description: "พัฒนาแอปพลิเคชันมือถือสำหรับตรวจสอบสถานะการดำเนินงานต่างๆ",
+                environments: ["dev", "staging"],
+                vendor: "Mobile Dev Pro",
+                architectureFile: "mobile-app-architecture.pdf",
+                architectureDesc: "ใช้ API Gateway + Lambda สำหรับ Backend API, DynamoDB สำหรับ Database, Cognito สำหรับ Authentication",
+                supportModel: "full-vendor",
+                supportModelLabel: "Full Vendor Managed",
+                status: "rejected",
+                submitDate: "2024-10-08",
+                timeline: [
+                    { date: "2024-10-08 11:00", action: "ส่งคำขอโครงการ", status: "success", user: "นายสมศักดิ์ ทำดี" },
+                    { date: "2024-10-09 16:45", action: "ไม่อนุมัติ", status: "rejected", user: "Admin User", comment: "สถาปัตยกรรมยังไม่สอดคล้องกับมาตรฐานความปลอดภัย กรุณาแก้ไขและส่งใหม่" }
+                ],
+                comments: [
+                    { date: "2024-10-09 16:45", user: "Admin User", text: "สถาปัตยกรรมยังไม่สอดคล้องกับมาตรฐานความปลอดภัย กรุณาแก้ไขและส่งใหม่" }
+                ]
+            },
+            {
+                id: 4,
+                projectName: "ระบบจัดการเอกสาร",
+                costCenter: "CC-2024-004",
+                projectManager: "นางสาววิไล เขียนโค้ด",
+                description: "พัฒนาระบบจัดการเอกสารอิเล็กทรอนิกส์ พร้อมระบบค้นหาและจัดเก็บ",
+                environments: ["dev", "prod"],
+                vendor: "Document Solutions Inc.",
+                architectureFile: "dms-architecture.pdf",
+                architectureDesc: "ใช้ ECS สำหรับ Application, S3 สำหรับ Document Storage, ElasticSearch สำหรับ Search Engine",
+                supportModel: "full-itc",
+                supportModelLabel: "Full ITC (ITC-Infra & Platform)",
+                status: "pending",
+                submitDate: "2024-10-20",
+                timeline: [
+                    { date: "2024-10-20 08:45", action: "ส่งคำขอโครงการ", status: "success", user: "นางสาววิไล เขียนโค้ด" }
+                ],
+                comments: []
+            }
+        ];
+
+        let currentProject = null;
+        let filteredProjects = [...projects];
+
+        // Initialize
+        function init() {
+            renderProjectsList();
+            updateStats();
+            setupEventListeners();
+        }
+
+        // Render projects list
+        function renderProjectsList() {
+            const container = document.getElementById('projects-list');
+            container.innerHTML = '';
+
+            if (filteredProjects.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        ไม่พบโครงการที่ตรงกับเงื่อนไขการค้นหา
+                    </div>
+                `;
+                return;
+            }
+
+            filteredProjects.forEach(project => {
+                const card = createProjectCard(project);
+                container.appendChild(card);
+            });
+        }
+
+        // Create project card element
+        function createProjectCard(project) {
+            const card = document.createElement('div');
+            card.className = 'card shadow-sm border-0 mb-3 project-card';
+            
+            const statusClass = project.status === 'pending' ? 'status-pending' : 
+                              project.status === 'approved' ? 'status-approved' : 'status-rejected';
+            const statusText = project.status === 'pending' ? 'รออนุมัติ' : 
+                             project.status === 'approved' ? 'อนุมัติแล้ว' : 'ไม่อนุมัติ';
+            
+            const envBadges = project.environments.map(env => {
+                const envLabel = env === 'dev' ? 'Dev' : env === 'staging' ? 'Staging' : 'Prod';
+                return `<span class="badge bg-secondary me-1">${envLabel}</span>`;
+            }).join('');
+
+            card.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">${project.projectName}</h5>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-hash"></i> ${project.costCenter}
+                        <span class="mx-2">|</span>
+                        <i class="bi bi-person"></i> ${project.projectManager}
+                    </p>
+                    <p class="card-text text-truncate mb-2">${project.description}</p>
+                    <div class="mb-2">
+                        ${envBadges}
+                        <span class="badge bg-info text-dark">${project.supportModelLabel}</span>
+                    </div>
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        ${project.submitDate}
+                    </small>
+                </div>
+            `;
+
+            card.addEventListener('click', () => showProjectDetail(project));
+            return card;
+        }
+
+        // Show project detail
+        function showProjectDetail(project) {
+            currentProject = project;
+            
+            // Update detail view
+            document.getElementById('detail-project-name').textContent = project.projectName;
+            document.getElementById('detail-submit-date').textContent = project.submitDate;
+            document.getElementById('detail-cost-center').textContent = project.costCenter;
+            document.getElementById('detail-project-manager').textContent = project.projectManager;
+            document.getElementById('detail-description').textContent = project.description;
+            document.getElementById('detail-vendor').textContent = project.vendor || 'ไม่ระบุ';
+            document.getElementById('detail-architecture-desc').textContent = project.architectureDesc || 'ไม่มีรายละเอียด';
+            document.getElementById('detail-support-model').textContent = project.supportModelLabel;
+
+            // Update status badge
+            const statusBadge = document.getElementById('detail-status');
+            statusBadge.className = 'status-badge';
+            if (project.status === 'pending') {
+                statusBadge.classList.add('status-pending');
+                statusBadge.textContent = 'รออนุมัติ';
+            } else if (project.status === 'approved') {
+                statusBadge.classList.add('status-approved');
+                statusBadge.textContent = 'อนุมัติแล้ว';
+            } else {
+                statusBadge.classList.add('status-rejected');
+                statusBadge.textContent = 'ไม่อนุมัติ';
+            }
+
+            // Update environments
+            const envContainer = document.getElementById('detail-environments');
+            envContainer.innerHTML = project.environments.map(env => {
+                const envLabel = env === 'dev' ? 'Development' : env === 'staging' ? 'Staging' : 'Production';
+                return `<span class="badge bg-secondary me-1">${envLabel}</span>`;
+            }).join('');
+
+            // Update timeline
+            const timelineContainer = document.getElementById('detail-timeline');
+            timelineContainer.innerHTML = project.timeline.map(item => {
+                const iconClass = item.status === 'success' ? 'success' : 
+                                item.status === 'pending' ? 'pending' : 'rejected';
+                const icon = item.status === 'success' ? '✓' : 
+                           item.status === 'pending' ? '⋯' : '✕';
+                
+                return `
+                    <div class="timeline-item">
+                        <div class="timeline-icon ${iconClass}">${icon}</div>
+                        <div>
+                            <strong>${item.action}</strong>
+                            <div class="text-muted small">
+                                ${item.user} - ${item.date}
+                            </div>
+                            ${item.comment ? `<div class="mt-1">${item.comment}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update comments
+            const commentsContainer = document.getElementById('comments-list');
+            if (project.comments.length === 0) {
+                commentsContainer.innerHTML = '<p class="text-muted">ยังไม่มีความคิดเห็น</p>';
+            } else {
+                commentsContainer.innerHTML = project.comments.map(comment => `
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between">
+                                <strong>${comment.user}</strong>
+                                <small class="text-muted">${comment.date}</small>
+                            </div>
+                            <p class="mb-0 mt-1">${comment.text}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Show/hide approval actions
+            const approvalActions = document.getElementById('approval-actions');
+            if (project.status === 'pending') {
+                approvalActions.style.display = 'block';
+            } else {
+                approvalActions.style.display = 'none';
+            }
+
+            // Switch views
+            document.querySelector('.list-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.add('active');
+        }
+
+        // Back to list
+        function backToList() {
+            document.querySelector('.list-view').classList.remove('hidden');
+            document.getElementById('detail-view').classList.remove('active');
+            currentProject = null;
+            document.getElementById('approval-comment').value = '';
+        }
+
+        // Update statistics
+        function updateStats() {
+            const pending = projects.filter(p => p.status === 'pending').length;
+            const approved = projects.filter(p => p.status === 'approved').length;
+            const rejected = projects.filter(p => p.status === 'rejected').length;
+
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('stats-pending').textContent = pending;
+            document.getElementById('stats-approved').textContent = approved;
+            document.getElementById('stats-rejected').textContent = rejected;
+        }
+
+        // Filter projects
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const statusFilters = Array.from(document.querySelectorAll('.filter-status:checked')).map(cb => cb.value);
+            const supportModelFilter = document.getElementById('filter-support-model').value;
+            const environmentFilter = document.getElementById('filter-environment').value;
+
+            filteredProjects = projects.filter(project => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    project.projectName.toLowerCase().includes(searchTerm) ||
+                    project.costCenter.toLowerCase().includes(searchTerm) ||
+                    project.projectManager.toLowerCase().includes(searchTerm);
+
+                // Status filter
+                const matchesStatus = statusFilters.length === 0 || statusFilters.includes(project.status);
+
+                // Support model filter
+                const matchesSupportModel = !supportModelFilter || project.supportModel === supportModelFilter;
+
+                // Environment filter
+                const matchesEnvironment = !environmentFilter || project.environments.includes(environmentFilter);
+
+                return matchesSearch && matchesStatus && matchesSupportModel && matchesEnvironment;
+            });
+
+            renderProjectsList();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('search-input').value = '';
+            document.querySelectorAll('.filter-status').forEach(cb => {
+                cb.checked = cb.value === 'pending';
+            });
+            document.getElementById('filter-support-model').value = '';
+            document.getElementById('filter-environment').value = '';
+            applyFilters();
+        }
+
+        // Approve project
+        function approveProject() {
+            const comment = document.getElementById('approval-comment').value.trim();
+            
+            if (confirm(`คุณต้องการอนุมัติโครงการ "${currentProject.projectName}" ใช่หรือไม่?`)) {
+                // Update project status
+                currentProject.status = 'approved';
+                currentProject.timeline.push({
+                    date: new Date().toLocaleString('th-TH'),
+                    action: 'ผู้ดูแลระบบอนุมัติ',
+                    status: 'success',
+                    user: 'Admin User',
+                    comment: comment || 'อนุมัติโครงการ'
+                });
+                
+                if (comment) {
+                    currentProject.comments.push({
+                        date: new Date().toLocaleString('th-TH'),
+                        user: 'Admin User',
+                        text: comment
+                    });
+                }
+
+                updateStats();
+                backToList();
+                applyFilters();
+                
+                // Show success message
+                showSuccessToast('อนุมัติโครงการสำเร็จ');
+            }
+        }
+
+        // Reject project
+        function rejectProject() {
+            const comment = document.getElementById('approval-comment').value.trim();
+            
+            if (!comment) {
+                alert('กรุณาระบุเหตุผลในการไม่อนุมัติ');
+                return;
+            }
+            
+            if (confirm(`คุณต้องการไม่อนุมัติโครงการ "${currentProject.projectName}" ใช่หรือไม่?`)) {
+                // Update project status
+                currentProject.status = 'rejected';
+                currentProject.timeline.push({
+                    date: new Date().toLocaleString('th-TH'),
+                    action: 'ไม่อนุมัติ',
+                    status: 'rejected',
+                    user: 'Admin User',
+                    comment: comment
+                });
+                
+                currentProject.comments.push({
+                    date: new Date().toLocaleString('th-TH'),
+                    user: 'Admin User',
+                    text: comment
+                });
+
+                updateStats();
+                backToList();
+                applyFilters();
+                
+                // Show success message
+                showSuccessToast('บันทึกการไม่อนุมัติเรียบร้อย');
+            }
+        }
+
+        // Show success toast
+        function showSuccessToast(message) {
+            // Simple alert for now - could be replaced with toast notification
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <i class="bi bi-check-circle-fill"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Back to list button
+            document.getElementById('back-to-list').addEventListener('click', backToList);
+
+            // Approval buttons
+            document.getElementById('btn-approve').addEventListener('click', approveProject);
+            document.getElementById('btn-reject').addEventListener('click', rejectProject);
+
+            // Filter controls
+            document.getElementById('search-input').addEventListener('input', applyFilters);
+            document.querySelectorAll('.filter-status').forEach(cb => {
+                cb.addEventListener('change', applyFilters);
+            });
+            document.getElementById('filter-support-model').addEventListener('change', applyFilters);
+            document.getElementById('filter-environment').addEventListener('change', applyFilters);
+            document.getElementById('clear-filters').addEventListener('click', clearFilters);
+        }
+
+        // Initialize on page load
+        init();
+    </script>
+</body>
+</html>
