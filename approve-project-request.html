@@ -126,6 +126,48 @@
             border-top: 2px solid #dee2e6;
             margin: -1rem -1rem 0 -1rem;
         }
+        
+        .budget-item {
+            padding: 0.5rem;
+            border-left: 3px solid #198754;
+            margin-bottom: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .budget-item:hover {
+            background: #e9ecef;
+            transform: translateX(2px);
+        }
+        
+        .budget-item.selected {
+            background: #d1e7dd;
+            border-left-color: #0f5132;
+        }
+        
+        .budget-progress {
+            height: 6px;
+            background: #dee2e6;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+        
+        .budget-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #198754, #20c997);
+            transition: width 0.3s;
+        }
+        
+        .budget-progress-bar.warning {
+            background: linear-gradient(90deg, #ffc107, #fd7e14);
+        }
+        
+        .budget-progress-bar.danger {
+            background: linear-gradient(90deg, #dc3545, #c82333);
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -233,6 +275,24 @@
                         <div class="d-flex justify-content-between">
                             <span>ไม่อนุมัติ:</span>
                             <strong class="text-danger" id="stats-rejected">0</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Budget Management Card -->
+                <div class="card shadow-sm border-0 mt-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-cash-stack text-success"></i>
+                                งบประมาณ
+                            </h6>
+                            <button class="btn btn-sm btn-outline-success" id="btn-add-budget">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                        </div>
+                        <div id="budget-list" class="budget-list">
+                            <!-- Budget items will be inserted here -->
                         </div>
                     </div>
                 </div>
@@ -400,6 +460,21 @@
                                 </h5>
                                 
                                 <div class="mb-3">
+                                    <label for="approval-budget" class="form-label fw-bold">
+                                        เลือกงบประมาณ <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="approval-budget" required>
+                                        <option value="">-- กรุณาเลือกงบประมาณ --</option>
+                                    </select>
+                                    <div id="selected-budget-info" class="mt-2 p-2 bg-light rounded" style="display: none;">
+                                        <small class="text-muted">
+                                            <strong>งบประมาณที่เลือก:</strong> <span id="budget-info-name"></span><br>
+                                            <strong>งบคงเหลือ:</strong> <span id="budget-info-remaining"></span>
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
                                     <label for="approval-comment" class="form-label fw-bold">ความคิดเห็น / หมายเหตุ</label>
                                     <textarea class="form-control" id="approval-comment" rows="3" placeholder="กรอกความคิดเห็นหรือหมายเหตุเพิ่มเติม..."></textarea>
                                 </div>
@@ -442,10 +517,73 @@
         </div>
     </div>
     
+    <!-- Budget Management Modal -->
+    <div class="modal fade" id="budgetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="budgetModalTitle">เพิ่มงบประมาณใหม่</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="budget-form">
+                        <div class="mb-3">
+                            <label for="budget-name" class="form-label">ชื่องบประมาณ <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="budget-name" required placeholder="เช่น งบประมาณ IT 2567">
+                        </div>
+                        <div class="mb-3">
+                            <label for="budget-year" class="form-label">ปีงบประมาณ <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="budget-year" required placeholder="เช่น 2567" min="2020" max="2100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="budget-amount" class="form-label">จำนวนเงินทั้งหมด (บาท) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="budget-amount" required placeholder="เช่น 5000000" min="0" step="1000">
+                        </div>
+                        <div class="mb-3">
+                            <label for="budget-description" class="form-label">รายละเอียด</label>
+                            <textarea class="form-control" id="budget-description" rows="2" placeholder="รายละเอียดเพิ่มเติมของงบประมาณ"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-success" id="save-budget">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
         // Sample data for demonstration
+        let budgets = [
+            {
+                id: 1,
+                name: "งบประมาณ IT 2567",
+                year: 2567,
+                totalAmount: 10000000,
+                allocatedAmount: 3000000,
+                description: "งบประมาณสำหรับโครงการ IT ประจำปี 2567"
+            },
+            {
+                id: 2,
+                name: "งบประมาณพัฒนาระบบ Q1/2567",
+                year: 2567,
+                totalAmount: 5000000,
+                allocatedAmount: 1500000,
+                description: "งบประมาณพัฒนาระบบไตรมาสที่ 1"
+            },
+            {
+                id: 3,
+                name: "งบประมาณ Digital Transformation",
+                year: 2567,
+                totalAmount: 15000000,
+                allocatedAmount: 12000000,
+                description: "งบประมาณสำหรับโครงการ Digital Transformation"
+            }
+        ];
+        
         let projects = [
             {
                 id: 1,
@@ -553,11 +691,14 @@
 
         let currentProject = null;
         let filteredProjects = [...projects];
+        let currentEditingBudget = null;
 
         // Initialize
         function init() {
             renderProjectsList();
             updateStats();
+            renderBudgetList();
+            updateBudgetDropdown();
             setupEventListeners();
         }
 
@@ -722,6 +863,8 @@
             document.getElementById('detail-view').classList.remove('active');
             currentProject = null;
             document.getElementById('approval-comment').value = '';
+            document.getElementById('approval-budget').value = '';
+            document.getElementById('selected-budget-info').style.display = 'none';
         }
 
         // Update statistics
@@ -779,16 +922,43 @@
         // Approve project
         function approveProject() {
             const comment = document.getElementById('approval-comment').value.trim();
+            const selectedBudgetId = parseInt(document.getElementById('approval-budget').value);
             
-            if (confirm(`คุณต้องการอนุมัติโครงการ "${currentProject.projectName}" ใช่หรือไม่?`)) {
+            if (!selectedBudgetId) {
+                alert('กรุณาเลือกงบประมาณก่อนอนุมัติ');
+                return;
+            }
+            
+            const selectedBudget = budgets.find(b => b.id === selectedBudgetId);
+            if (!selectedBudget) {
+                alert('ไม่พบงบประมาณที่เลือก');
+                return;
+            }
+            
+            // Simple budget amount check (in real system, project would have a cost)
+            const projectEstimatedCost = 500000; // Mock value
+            const remainingBudget = selectedBudget.totalAmount - selectedBudget.allocatedAmount;
+            
+            if (projectEstimatedCost > remainingBudget) {
+                alert(`งบประมาณคงเหลือไม่เพียงพอ\nต้องการ: ${formatNumber(projectEstimatedCost)} บาท\nคงเหลือ: ${formatNumber(remainingBudget)} บาท`);
+                return;
+            }
+            
+            if (confirm(`คุณต้องการอนุมัติโครงการ "${currentProject.projectName}" ใช่หรือไม่?\n\nใช้งบประมาณ: ${selectedBudget.name}\nจำนวนเงินโครงการ: ${formatNumber(projectEstimatedCost)} บาท`)) {
+                // Update budget allocation
+                selectedBudget.allocatedAmount += projectEstimatedCost;
+                
                 // Update project status
                 currentProject.status = 'approved';
+                currentProject.budgetId = selectedBudgetId;
+                currentProject.budgetName = selectedBudget.name;
+                currentProject.allocatedAmount = projectEstimatedCost;
                 currentProject.timeline.push({
                     date: new Date().toLocaleString('th-TH'),
                     action: 'ผู้ดูแลระบบอนุมัติ',
                     status: 'success',
                     user: 'Admin User',
-                    comment: comment || 'อนุมัติโครงการ'
+                    comment: comment || `อนุมัติโครงการ (งบประมาณ: ${selectedBudget.name})`
                 });
                 
                 if (comment) {
@@ -800,6 +970,8 @@
                 }
 
                 updateStats();
+                renderBudgetList();
+                updateBudgetDropdown();
                 backToList();
                 applyFilters();
                 
@@ -860,6 +1032,161 @@
                 alertDiv.remove();
             }, 3000);
         }
+        
+        // Budget Management Functions
+        
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
+        // Render budget list in sidebar
+        function renderBudgetList() {
+            const container = document.getElementById('budget-list');
+            
+            if (budgets.length === 0) {
+                container.innerHTML = '<p class="text-muted small mb-0">ยังไม่มีงบประมาณ</p>';
+                return;
+            }
+            
+            container.innerHTML = budgets.map(budget => {
+                const remaining = budget.totalAmount - budget.allocatedAmount;
+                const percentUsed = (budget.allocatedAmount / budget.totalAmount * 100).toFixed(1);
+                const progressClass = percentUsed > 90 ? 'danger' : percentUsed > 70 ? 'warning' : '';
+                
+                return `
+                    <div class="budget-item" data-budget-id="${budget.id}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold small">${budget.name}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">
+                                    คงเหลือ: ${formatNumber(remaining)} / ${formatNumber(budget.totalAmount)} บาท
+                                </div>
+                                <div class="budget-progress">
+                                    <div class="budget-progress-bar ${progressClass}" style="width: ${percentUsed}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Update budget dropdown in approval section
+        function updateBudgetDropdown() {
+            const select = document.getElementById('approval-budget');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="">-- กรุณาเลือกงบประมาณ --</option>';
+            
+            budgets.forEach(budget => {
+                const remaining = budget.totalAmount - budget.allocatedAmount;
+                const option = document.createElement('option');
+                option.value = budget.id;
+                option.textContent = `${budget.name} (คงเหลือ: ${formatNumber(remaining)} บาท)`;
+                if (remaining <= 0) {
+                    option.disabled = true;
+                    option.textContent += ' - งบหมด';
+                }
+                select.appendChild(option);
+            });
+            
+            if (currentValue) {
+                select.value = currentValue;
+            }
+        }
+        
+        // Show budget selection info
+        function showBudgetInfo(budgetId) {
+            const budget = budgets.find(b => b.id === budgetId);
+            if (!budget) {
+                document.getElementById('selected-budget-info').style.display = 'none';
+                return;
+            }
+            
+            const remaining = budget.totalAmount - budget.allocatedAmount;
+            document.getElementById('budget-info-name').textContent = budget.name;
+            document.getElementById('budget-info-remaining').textContent = formatNumber(remaining) + ' บาท';
+            document.getElementById('selected-budget-info').style.display = 'block';
+        }
+        
+        // Open budget modal for adding new budget
+        function openBudgetModal() {
+            currentEditingBudget = null;
+            document.getElementById('budgetModalTitle').textContent = 'เพิ่มงบประมาณใหม่';
+            document.getElementById('budget-form').reset();
+            document.getElementById('budget-year').value = new Date().getFullYear() + 543; // Thai year
+            
+            // Show modal using vanilla JS
+            const modalElement = document.getElementById('budgetModal');
+            modalElement.style.display = 'block';
+            modalElement.classList.add('show');
+            modalElement.setAttribute('aria-hidden', 'false');
+            
+            // Add backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-backdrop';
+            document.body.appendChild(backdrop);
+            document.body.classList.add('modal-open');
+        }
+        
+        // Close budget modal
+        function closeBudgetModal() {
+            const modalElement = document.getElementById('budgetModal');
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            modalElement.setAttribute('aria-hidden', 'true');
+            
+            // Remove backdrop
+            const backdrop = document.getElementById('modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            document.body.classList.remove('modal-open');
+        }
+        
+        // Save budget
+        function saveBudget() {
+            const name = document.getElementById('budget-name').value.trim();
+            const year = parseInt(document.getElementById('budget-year').value);
+            const amount = parseFloat(document.getElementById('budget-amount').value);
+            const description = document.getElementById('budget-description').value.trim();
+            
+            if (!name || !year || !amount) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            
+            if (amount <= 0) {
+                alert('จำนวนเงินต้องมากกว่า 0');
+                return;
+            }
+            
+            if (currentEditingBudget) {
+                // Edit existing budget
+                currentEditingBudget.name = name;
+                currentEditingBudget.year = year;
+                currentEditingBudget.totalAmount = amount;
+                currentEditingBudget.description = description;
+            } else {
+                // Add new budget
+                const newBudget = {
+                    id: budgets.length > 0 ? Math.max(...budgets.map(b => b.id)) + 1 : 1,
+                    name: name,
+                    year: year,
+                    totalAmount: amount,
+                    allocatedAmount: 0,
+                    description: description
+                };
+                budgets.push(newBudget);
+            }
+            
+            renderBudgetList();
+            updateBudgetDropdown();
+            closeBudgetModal();
+            showSuccessToast('บันทึกงบประมาณสำเร็จ');
+        }
 
         // Setup event listeners
         function setupEventListeners() {
@@ -878,6 +1205,25 @@
             document.getElementById('filter-support-model').addEventListener('change', applyFilters);
             document.getElementById('filter-environment').addEventListener('change', applyFilters);
             document.getElementById('clear-filters').addEventListener('click', clearFilters);
+            
+            // Budget management
+            document.getElementById('btn-add-budget').addEventListener('click', openBudgetModal);
+            document.getElementById('save-budget').addEventListener('click', saveBudget);
+            
+            // Budget modal close buttons
+            document.querySelectorAll('#budgetModal .btn-close, #budgetModal .btn-secondary').forEach(btn => {
+                btn.addEventListener('click', closeBudgetModal);
+            });
+            
+            // Budget selection change
+            document.getElementById('approval-budget').addEventListener('change', function() {
+                const budgetId = parseInt(this.value);
+                if (budgetId) {
+                    showBudgetInfo(budgetId);
+                } else {
+                    document.getElementById('selected-budget-info').style.display = 'none';
+                }
+            });
         }
 
         // Initialize on page load
