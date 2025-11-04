@@ -143,8 +143,8 @@
                                 <div class="col-md-6">
                                     <label for="project-end-date" class="form-label">6. วันที่สิ้นสุดโครงการ (Project End Date) *</label>
                                     <input type="date" class="form-control" id="project-end-date" required>
-                                    <div class="invalid-feedback" id="date-error">
-                                        วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการ
+                                    <div class="invalid-feedback d-block" id="date-error" style="display: none;">
+                                        วันที่สิ้นสุดโครงการต้องมาหลังจากวันที่เริ่มโครงการ
                                     </div>
                                 </div>
                             </div>
@@ -321,6 +321,7 @@
             document.getElementById('project-sla').classList.remove('is-invalid');
             document.getElementById('project-priority').classList.remove('is-invalid');
             document.getElementById('env-error').style.display = 'none';
+            document.getElementById('date-error').style.display = 'none';
             
             let isValid = true;
             
@@ -355,8 +356,9 @@
             }
             
             // Validate that end date is after start date
-            if (projectStartDate && projectEndDate && projectEndDate < projectStartDate) {
+            if (projectStartDate && projectEndDate && new Date(projectEndDate) <= new Date(projectStartDate)) {
                 document.getElementById('project-end-date').classList.add('is-invalid');
+                document.getElementById('date-error').style.display = 'block';
                 isValid = false;
             }
             
