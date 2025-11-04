@@ -300,6 +300,29 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="info-label">วันที่เริ่มโครงการ</div>
+                                    <div class="info-value" id="detail-start-date">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-label">วันที่สิ้นสุดโครงการ</div>
+                                    <div class="info-value" id="detail-end-date">-</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="info-label">SLA ที่ต้องการ</div>
+                                <div class="info-value" id="detail-sla">-</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="info-label">ระดับความสำคัญ (Priority)</div>
+                                <div class="info-value">
+                                    <span class="badge bg-primary" id="detail-priority">-</span>
+                                </div>
+                            </div>
+
                             <div class="mb-4">
                                 <div class="info-label">คำอธิบายโครงการ (Business Objective)</div>
                                 <div class="info-value" id="detail-description">-</div>
@@ -430,6 +453,11 @@
                 costCenter: "CC-2024-001",
                 projectManager: "นายสมชาย ใจดี",
                 description: "พัฒนาระบบให้บริการประชาชนผ่านช่องทางออนไลน์ เพื่อเพิ่มความสะดวกในการเข้าถึงบริการภาครัฐ",
+                startDate: "2024-11-01",
+                endDate: "2025-03-31",
+                sla: "99.9% uptime, Response time < 2s",
+                priority: "public-service",
+                priorityLabel: "บริการประชาชน",
                 environments: ["dev", "staging", "prod"],
                 vendor: "ABC Technology Co., Ltd.",
                 architectureFile: "architecture-diagram.pdf",
@@ -449,6 +477,11 @@
                 costCenter: "CC-2024-002",
                 projectManager: "นางสาวสมหญิง รักงาน",
                 description: "สร้างระบบคลังข้อมูลกลางสำหรับรวบรวมและวิเคราะห์ข้อมูลจากหลายหน่วยงาน",
+                startDate: "2024-10-15",
+                endDate: "2025-06-30",
+                sla: "99.5% uptime, Data sync < 5 minutes",
+                priority: "government-service",
+                priorityLabel: "บริการหน่วยงานรัฐ",
                 environments: ["prod"],
                 vendor: "XYZ Solutions Ltd.",
                 architectureFile: "data-warehouse-arch.pdf",
@@ -471,6 +504,11 @@
                 costCenter: "CC-2024-003",
                 projectManager: "นายสมศักดิ์ ทำดี",
                 description: "พัฒนาแอปพลิเคชันมือถือสำหรับตรวจสอบสถานะการดำเนินงานต่างๆ",
+                startDate: "2024-12-01",
+                endDate: "2025-05-31",
+                sla: "99.0% uptime, Response time < 3s",
+                priority: "other",
+                priorityLabel: "อื่นๆ",
                 environments: ["dev", "staging"],
                 vendor: "Mobile Dev Pro",
                 architectureFile: "mobile-app-architecture.pdf",
@@ -493,6 +531,11 @@
                 costCenter: "CC-2024-004",
                 projectManager: "นางสาววิไล เขียนโค้ด",
                 description: "พัฒนาระบบจัดการเอกสารอิเล็กทรอนิกส์ พร้อมระบบค้นหาและจัดเก็บ",
+                startDate: "2024-11-15",
+                endDate: "2025-04-30",
+                sla: "99.9% uptime, Search response < 1s",
+                priority: "cii",
+                priorityLabel: "CII (Critical Information Infrastructure)",
                 environments: ["dev", "prod"],
                 vendor: "Document Solutions Inc.",
                 architectureFile: "dms-architecture.pdf",
@@ -590,6 +633,10 @@
             document.getElementById('detail-submit-date').textContent = project.submitDate;
             document.getElementById('detail-cost-center').textContent = project.costCenter;
             document.getElementById('detail-project-manager').textContent = project.projectManager;
+            document.getElementById('detail-start-date').textContent = project.startDate || 'ไม่ระบุ';
+            document.getElementById('detail-end-date').textContent = project.endDate || 'ไม่ระบุ';
+            document.getElementById('detail-sla').textContent = project.sla || 'ไม่ระบุ';
+            document.getElementById('detail-priority').textContent = project.priorityLabel || 'ไม่ระบุ';
             document.getElementById('detail-description').textContent = project.description;
             document.getElementById('detail-vendor').textContent = project.vendor || 'ไม่ระบุ';
             document.getElementById('detail-architecture-desc').textContent = project.architectureDesc || 'ไม่มีรายละเอียด';
