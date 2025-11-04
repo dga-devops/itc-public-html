@@ -143,6 +143,9 @@
                                 <div class="col-md-6">
                                     <label for="project-end-date" class="form-label">6. วันที่สิ้นสุดโครงการ (Project End Date) *</label>
                                     <input type="date" class="form-control" id="project-end-date" required>
+                                    <div class="invalid-feedback" id="date-error">
+                                        วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการ
+                                    </div>
                                 </div>
                             </div>
 
@@ -354,7 +357,6 @@
             // Validate that end date is after start date
             if (projectStartDate && projectEndDate && projectEndDate < projectStartDate) {
                 document.getElementById('project-end-date').classList.add('is-invalid');
-                alert('วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการ (Project end date must be after start date)');
                 isValid = false;
             }
             
