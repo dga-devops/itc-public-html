@@ -135,8 +135,35 @@
                                 <textarea class="form-control" id="project-description" rows="3" required></textarea>
                             </div>
 
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="project-start-date" class="form-label">5. วันที่เริ่มโครงการ (Project Start Date) *</label>
+                                    <input type="date" class="form-control" id="project-start-date" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="project-end-date" class="form-label">6. วันที่สิ้นสุดโครงการ (Project End Date) *</label>
+                                    <input type="date" class="form-control" id="project-end-date" required>
+                                </div>
+                            </div>
+
                             <div class="mb-3">
-                                <label class="form-label">5. สภาพแวดล้อมที่ต้องการ (Environments) *</label>
+                                <label for="project-sla" class="form-label">7. SLA ที่ต้องการ (Desired SLA) *</label>
+                                <input type="text" class="form-control" id="project-sla" placeholder="เช่น 99.9% uptime, Response time < 2s" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="project-priority" class="form-label">8. ระดับความสำคัญ (Priority) *</label>
+                                <select class="form-select" id="project-priority" required>
+                                    <option value="">เลือกระดับความสำคัญ</option>
+                                    <option value="cii">CII (Critical Information Infrastructure)</option>
+                                    <option value="public-service">บริการประชาชน</option>
+                                    <option value="government-service">บริการหน่วยงานรัฐ</option>
+                                    <option value="other">อื่นๆ</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">9. สภาพแวดล้อมที่ต้องการ (Environments) *</label>
                                 <div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input environment-checkbox" type="checkbox" value="dev" id="env-dev">
@@ -170,22 +197,22 @@
                             <h2 class="h5 border-bottom pb-2 mb-3">ส่วนที่ 2: ข้อมูลเทคนิค (Technical Approval)</h2>
 
                             <div class="mb-3">
-                                <label for="vendor-info" class="form-label">6. ข้อมูล Vendor (ถ้ามี)</label>
+                                <label for="vendor-info" class="form-label">10. ข้อมูล Vendor (ถ้ามี)</label>
                                 <input type="text" class="form-control" id="vendor-info">
                             </div>
 
                             <div class="mb-3">
-                                <label for="architecture-file" class="form-label">7. ไฟล์สถาปัตยกรรมที่เสนอ *</label>
+                                <label for="architecture-file" class="form-label">11. ไฟล์สถาปัตยกรรมที่เสนอ *</label>
                                 <input class="form-control" type="file" id="architecture-file" required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="architecture-desc" class="form-label">8. คำอธิบายสถาปัตยกรรม (AWS Services ที่จะใช้)</label>
+                                <label for="architecture-desc" class="form-label">12. คำอธิบายสถาปัตยกรรม (AWS Services ที่จะใช้)</label>
                                 <textarea class="form-control" id="architecture-desc" rows="3" placeholder="เช่น ใช้ ECS Fargate, RDS PostgreSQL, S3..."></textarea>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">9. โมเดลการสนับสนุนที่ร้องขอ *</label>
+                                <label class="form-label">13. โมเดลการสนับสนุนที่ร้องขอ *</label>
                                 
                                 <div class="border rounded p-3 mb-2">
                                     <div class="form-check">
@@ -275,6 +302,10 @@
             const costCenter = document.getElementById('cost-center').value.trim();
             const projectManager = document.getElementById('project-manager').value.trim();
             const projectDescription = document.getElementById('project-description').value.trim();
+            const projectStartDate = document.getElementById('project-start-date').value;
+            const projectEndDate = document.getElementById('project-end-date').value;
+            const projectSla = document.getElementById('project-sla').value.trim();
+            const projectPriority = document.getElementById('project-priority').value;
             const environmentsChecked = document.querySelectorAll('.environment-checkbox:checked').length > 0;
             
             // Clear previous validation states
@@ -282,6 +313,10 @@
             document.getElementById('cost-center').classList.remove('is-invalid');
             document.getElementById('project-manager').classList.remove('is-invalid');
             document.getElementById('project-description').classList.remove('is-invalid');
+            document.getElementById('project-start-date').classList.remove('is-invalid');
+            document.getElementById('project-end-date').classList.remove('is-invalid');
+            document.getElementById('project-sla').classList.remove('is-invalid');
+            document.getElementById('project-priority').classList.remove('is-invalid');
             document.getElementById('env-error').style.display = 'none';
             
             let isValid = true;
@@ -303,6 +338,33 @@
             
             if (!projectDescription) {
                 document.getElementById('project-description').classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            if (!projectStartDate) {
+                document.getElementById('project-start-date').classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            if (!projectEndDate) {
+                document.getElementById('project-end-date').classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            // Validate that end date is after start date
+            if (projectStartDate && projectEndDate && projectEndDate < projectStartDate) {
+                document.getElementById('project-end-date').classList.add('is-invalid');
+                alert('วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการ (Project end date must be after start date)');
+                isValid = false;
+            }
+            
+            if (!projectSla) {
+                document.getElementById('project-sla').classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            if (!projectPriority) {
+                document.getElementById('project-priority').classList.add('is-invalid');
                 isValid = false;
             }
             
