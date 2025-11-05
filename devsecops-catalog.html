@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSecOps Catalog (Friendly Names)</title>
+    <!-- Chosen Palette: Modern Indigo & Slate -->
+    <!-- Application Structure Plan:
+        ** RE-STRUCTURED based on user feedback (Friendly Names) **
+        1.  **Structure:** คงการจัดเรียงแบบ DevSecOps Lifecycle
+        2.  **UX/Copywriting:** เปลี่ยนชื่อเมนูใน Nav Bar (e.g., Request Status -> ติดตามคำขอ)
+        3.  **UX/Copywriting:** เปลี่ยนชื่อ Service Cards ทั้งหมด (e.g., Onboard Service... -> สร้าง Service ใหม่, Run SAST Scan -> ตรวจความปลอดภัยโค้ด)
+        4.  **UX/Copywriting (User Feedback):** เปลี่ยนชื่อการ์ด GitHub เป็น "จัดการ GitHub & CI/CD" ตามที่ผู้ใช้แนะนำ
+        5.  **JS Update:** อัปเดต 'serviceDetails' object (modal titles) และ 'requestAnalyticsData' (chart labels) ให้ตรงกับชื่อการ์ดใหม่ทั้งหมด
+    -->
+    <!-- Visualization & Content Choices:
+        - All dashboards (Request, Health, DORA) and other forms remain unchanged.
+        - The core update is the user-facing text (copywriting) for navigation and service cards.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary-50: #EEF2FF;
+            --color-primary-100: #E0E7FF;
+            --color-primary-500: #6366F1; /* Indigo-500 */
+            --color-primary-600: #4F46E5; /* Indigo-600 */
+            --color-primary-800: #3730A3; /* Indigo-800 */
+            
+            --color-build: #7C3AED; /* Violet-500 */
+            --color-deploy: #3B82F6; /* Blue-500 */
+            --color-secure: #10B981; /* Emerald-500 */
+            --color-react: #EF4444; /* Red-500 */
+
+            --color-bg: #F8FAFC; /* Slate-50 */
+            --color-text: #334155; /* Slate-700 */
+            --color-header: #1E293B; /* Slate-800 */
+            --color-border: #E2E8F0; /* Slate-200 */
+        }
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+        .service-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            border: 1px solid var(--color-border);
+            padding: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border-top-width: 4px;
+        }
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Lifecycle Border Colors */
+        .card-border-create { border-top-color: var(--color-primary-500); }
+        .card-border-build { border-top-color: var(--color-build); }
+        .card-border-deploy { border-top-color: var(--color-deploy); }
+        .card-border-secure { border-top-color: var(--color-secure); }
+        .card-border-react { border-top-color: var(--color-react); }
+
+        /* Table Styles */
+        .data-table th, .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+            white-space: nowrap;
+        }
+        .data-table th {
+            background-color: #F8FAFC; /* Slate-50 */
+            font-weight: 600;
+            color: var(--color-primary-800);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .data-table tbody tr:hover {
+            background-color: var(--color-primary-50);
+        }
+        .status-done { color: #16a34a; font-weight: 600; }
+        .status-pending { color: #f59e0b; font-weight: 600; }
+        .dep-tag {
+            display: inline-block;
+            background-color: var(--color-primary-100);
+            color: var(--color-primary-800);
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        /* Request Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .status-pending-bg { background-color: #FFFBEB; color: #D97706; }
+        .status-progress-bg { background-color: #EFF6FF; color: #2563EB; }
+        .status-completed-bg { background-color: #F0FDF4; color: #16A34A; }
+        /* Form Fieldset Styling */
+        .form-fieldset {
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-legend {
+            padding: 0 0.5rem;
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600;
+            color: var(--color-primary-600);
+        }
+        .radio-label { /* Updated from checkbox-label */
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .radio-label:hover {
+            background-color: var(--color-primary-50);
+        }
+        .radio-label input:checked ~ .radio-content {
+             font-weight: 600;
+             color: var(--color-primary-600);
+        }
+        .radio-label input[type="radio"] {
+            margin-right: 0.75rem;
+            color: var(--color-primary-600);
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            color: var(--color-text);
+        }
+        .checkbox-input {
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.75rem;
+            border-radius: 0.25rem;
+            border-color: #94a3b8;
+            color: var(--color-primary-600);
+            transition: all 0.2s ease;
+        }
+        .checkbox-input:checked {
+             border-color: var(--color-primary-600);
+             background-color: var(--color-primary-600);
+        }
+        /* Form Inputs */
+        .form-input {
+             display: block;
+             width: 100%;
+             border-radius: 0.375rem;
+             border: 1px solid var(--color-border);
+             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+             padding: 0.5rem 0.75rem;
+             color: var(--color-header);
+             transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 3px var(--color-primary-100);
+            outline: none;
+        }
+        .form-label {
+            display: block;
+            text-sm font-medium;
+            color: var(--color-header);
+            margin-bottom: 0.25rem;
+        }
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: var(--color-primary-600);
+            color: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .btn-primary:hover {
+            background-color: var(--color-primary-800);
+        }
+        .btn-secondary {
+            background-color: white;
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+        .btn-secondary:hover {
+            background-color: var(--color-bg);
+        }
+        .btn-danger {
+            background-color: #EF4444; /* red-500 */
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #DC2626; /* red-600 */
+        }
+        
+        /* Badges for Data Class / Residency */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .badge-red-bg { background-color: #FEE2E2; color: #DC2626; }
+        .badge-yellow-bg { background-color: #FEF3C7; color: #D97706; }
+        .badge-blue-bg { background-color: #DBEAFE; color: #2563EB; }
+        .badge-green-bg { background-color: #DCFCE7; color: #16A34A; }
+        .badge-gray-bg { background-color: #F3F4F6; color: #4B5563; }
+
+        /* Sticky Header */
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--color-border);
+            transition: box-shadow 0.3s ease;
+        }
+        .sticky-nav.scrolled {
+             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .nav-link {
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            color: var(--color-text);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            color: var(--color-primary-600);
+            border-bottom-color: var(--color-primary-600);
+        }
+        
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 50;
+        }
+        .modal-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 48rem; /* 768px */
+            max-height: 90vh;
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            z-index: 51;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--color-border);
+            background-color: var(--color-bg);
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+        }
+        
+        /* Stepper Styles */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background-color: var(--color-bg);
+            border-radius: 0.5rem;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+            position: relative;
+        }
+        .step-indicator {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid var(--color-border);
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        .step-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            color: var(--color-text);
+            transition: all 0.3s ease;
+        }
+        .step-line {
+            position: absolute;
+            top: 1.25rem;
+            left: 50%;
+            right: -50%;
+            height: 2px;
+            background-color: var(--color-border);
+            z-index: 0;
+        }
+        .step:last-child .step-line {
+            display: none;
+        }
+        .step.step-active .step-indicator {
+            background-color: var(--color-primary-600);
+            border-color: var(--color-primary-600);
+            color: white;
+        }
+        .step.step-active .step-label {
+            color: var(--color-primary-600);
+        }
+        .step.step-completed .step-indicator {
+            background-color: var(--color-primary-100);
+            border-color: var(--color-primary-500);
+            color: var(--color-primary-600);
+        }
+        
+        /* Stat Card for DORA */
+        .stat-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            border: 1px solid var(--color-border);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            text-align: center;
+        }
+        .stat-card-title {
+            color: var(--color-text);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .stat-card-value {
+            color: var(--color-primary-600);
+            font-weight: 700;
+            font-size: 2.25rem; /* 36px */
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Sticky Navigation -->
+    <nav id="sticky-nav" class="sticky-nav w-full">
+        <div class="container mx-auto px-4 md:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex-shrink-0">
+                    <h2 class="text-xl font-bold" style="color: var(--color-header);">DevSecOps Catalog</h2>
+                </div>
+                <div class="hidden md:flex space-x-2">
+                    <a href="#service-catalog" class="nav-link">Service Catalog (เมนูบริการ)</a>
+                    <a href="#inventory" class="nav-link">My Inventory (คลังข้อมูล Service)</a>
+                    <a href="#request-dashboard" class="nav-link">Request Dashboard (ภาพรวมคำขอ)</a>
+                    <a href="#health" class="nav-link">Health Dashboard (ภาพรวมระบบ)</a>
+                    <a href="#request-status" class="nav-link">ติดตามคำขอ</a>
+                </div>
+                <div class="md:hidden">
+                    <button class="p-2"><span class="text-2xl">☰</span></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center my-12 md:my-16">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: var(--color-header);">
+                DevSecOps Service Catalog
+            </h1>
+            <p class="text-xl text-gray-600" style="color: var(--color-text);">
+                แพลตฟอร์มบริการสำหรับ AWS ECS และ GitHub (NCSA, ISO 27001/27701, AWS Compliant)
+            </p>
+        </header>
+
+        <!-- Main Catalog View -->
+        <div id="catalog-view">
+            <section id="service-catalog" class="mb-16 scroll-mt-24">
+                <h2 class="text-3xl font-bold mb-10 text-center" style="color: var(--color-header);">
+                    แคตตาล็อกบริการ (Service Catalog)
+                </h2>
+
+                <!-- Lifecycle Grouping: 1. Plan & Create -->
+                <h3 class="text-2xl font-semibold mb-4" style="color: var(--color-primary-800);">1. Plan & Create</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="service-card card-border-create" data-service-id="onboard">
+                        <span class="text-4xl">🚀</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">สร้าง Service ใหม่</h3>
+                        <p>
+                            (PLAN/CREATE) ร้องขอสร้าง Service ใหม่ (SLA: 5 working days)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Lifecycle Grouping: 2. Build & Test -->
+                <h3 class="text-2xl font-semibold mb-4" style="color: var(--color-build);">2. Build & Test</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                     <div class="service-card card-border-build" data-service-id="manage-github">
+                        <span class="text-4xl">⚙️</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">จัดการ GitHub & CI/CD</h3>
+                        <p>
+                            (BUILD) สร้าง Repo, จัดการ CI/CD (SLA: 1 working day)
+                        </p>
+                    </div>
+                    <div class="service-card card-border-build" data-service-id="security-sast">
+                        <span class="text-4xl">🛡️</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">ตรวจความปลอดภัยโค้ด (SAST)</h3>
+                        <p>
+                            (TEST/SECURE) สั่งรัน SAST (Static Analysis) (SLA: 1 working day)
+                        </p>
+                    </div>
+                    <div class="service-card card-border-build" data-service-id="security-secrets">
+                        <span class="text-4xl">🔑</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">ตรวจหา Secrets ในโค้ด</h3>
+                        <p>
+                            (TEST/SECURE) สแกนหา Secrets ใน Code (A.8.12) (SLA: On-demand)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Lifecycle Grouping: 3. Release & Deploy -->
+                <h3 class="text-2xl font-semibold mb-4" style="color: var(--color-deploy);">3. Release & Deploy</h3>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="service-card card-border-deploy" data-service-id="infra-change">
+                        <span class="text-4xl">🏗️</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">อัปเดต Service / Infra</h3>
+                        <p>
+                            (RELEASE/DEPLOY) ร้องขอเปลี่ยนแปลง Service (SLA: 2 working days)
+                        </p>
+                    </div>
+                    <div class="service-card card-border-deploy" data-service-id="security-container">
+                        <span class="text-4xl">📦</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">ตรวจความปลอดภัย Container (ECR)</h3>
+                        <p>
+                            (RELEASE/SECURE) สแกนช่องโหว่ Container Image (A.5.23)
+                        </p>
+                    </div>
+                    <div class="service-card card-border-deploy" data-service-id="security-dast">
+                        <span class="text-4xl">📡</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">ตรวจความปลอดภัยเว็บ (DAST)</h3>
+                        <p>
+                            (DEPLOY/SECURE) สั่งรัน DAST (Dynamic Analysis)
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Lifecycle Grouping: 4. Operate & Secure -->
+                <h3 class="text-2xl font-semibold mb-4" style="color: var(--color-secure);">4. Operate & Secure</h3>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="service-card card-border-secure" data-service-id="manage-cert">
+                        <span class="text-4xl">📜</span>
+                        <h3 class="text-xl font-semibold my-2" style="color: var(--color-header);">ขอ/ต่ออายุ Certificate</h3>
+                        <p>
+                            (OPERATE/SECURE) ร้องขอ Certificate ใหม่ (SLA: 3 working days)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Lifecycle Grouping: 5. Monitor & React -->
+                <h3 class="text-2xl font-semibold mb-4" style="color: var(--color-react);">5. Monitor & React</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="service-card card-border-react" data-service-id="incident">
+                        <span class="text-4xl">🔥</span>
+                        <h3 class="text-xl font-semibold my-2 text-red-600">แจ้งเหตุฉุกเฉิน (Incident)</h3>
+                        <p>
+                            (MONITOR/REACT) แจ้งเหตุระบบล่ม (SLA: 15 min response for P1)
+                        </p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Project Inventory Section -->
+            <section id="inventory" class="mb-16 scroll-mt-24">
+                <h2 class="text-3xl font-bold mb-10 text-center" style="color: var(--color-header);">
+                    คลังข้อมูลโปรเจกต์ (My Inventory)
+                </h2>
+                
+                <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden border border-[var(--color-border)]">
+                    <div class="p-6">
+                         <p class="text-lg text-gray-600 mb-6 text-center max-w-2xl mx-auto">
+                            ตารางแสดงข้อมูล Service ทั้งหมด (อิงจาก "All ECS list" - ISO 27001 A.5.12)
+                        </p>
+                        <!-- Filters -->
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <input type="text" id="inventory-search" placeholder="ค้นหาชื่อ Service, Repo, Path..." class="md:col-span-2 form-input">
+                            <select id="inventory-project-filter" class="form-input">
+                                <option value="">ทุก Main Project</option>
+                                <option value="miniapps">miniapps</option>
+                                <option value="digital-inbox">digital-inbox</option>
+                                <option value="cch">cch</option>
+                                <option value="bizportal">bizportal</option>
+                                <option value="digitalid">digitalid</option>
+                            </select>
+                             <select id="inventory-data-class-filter" class="form-input">
+                                <option value="">ทุก Data Class</option>
+                                <option value="Public">Public</option>
+                                <option value="Internal">Internal</option>
+                                <option value="Confidential">Confidential</option>
+                                <option value="PII">Personal Data (PII)</option>
+                            </select>
+                             <select id="inventory-status-filter" class="form-input">
+                                <option value="">ทุกสถานะ</option>
+                                <option value="DONE">DONE</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Table -->
+                    <div class="overflow-x-auto max-h-[600px]">
+                        <table class="min-w-full data-table" id="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Main Project</th>
+                                    <th>Requester (Owner)</th>
+                                    <th>สถานะ</th>
+                                    <th>Data Class (NCSA)</th>
+                                    <th>Residency (NCSA)</th>
+                                    <th>Env</th>
+                                    <th>ALB Path</th>
+                                    <th>GitHub Repo</th>
+                                    <th>ECS Service</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body">
+                                <!-- Dynamic Rows Go Here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Service Request Dashboard -->
+            <section id="request-dashboard" class="mb-16 scroll-mt-24">
+                <h2 class="text-3xl font-bold mb-10 text-center" style="color: var(--color-header);">
+                    ภาพรวมคำขอบริการ (Request Dashboard)
+                </h2>
+                <p class="text-lg text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+                    ติดตามความถี่ (Frequency) และระยะเวลาดำเนินการ (Resolution Time) ของคำขอบริการ
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Request Frequency -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border border-[var(--color-border)]">
+                        <h3 class="text-xl font-semibold text-center mb-4" style="color: var(--color-header);">ความถี่คำขอ (30 วันล่าสุด)</h3>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="requestFreqChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Request Resolution Time -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border border-[var(--color-border)]">
+                        <h3 class="text-xl font-semibold text-center mb-4" style="color: var(--color-header);">เวลาเฉลี่ยในการดำเนินการ (วัน)</h3>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="requestTimeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Request Status Section -->
+            <section id="request-status" class="mb-16 scroll-mt-24">
+                <h2 class="text-3xl font-bold mb-10 text-center" style="color: var(--color-header);">
+                    ติดตามคำขอ (Audit Log)
+                </h2>
+                <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden border border-[var(--color-border)]">
+                    <div class="p-6">
+                        <p class="text-lg text-gray-600 mb-6 text-center max-w-2xl mx-auto">
+                            ติดตามสถานะ Service Request (SR) และประวัติการอนุมัติ (ISO 27001 Audit Trail)
+                        </p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full data-table" id="request-status-table">
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>ประเภทบริการ</th>
+                                    <th>ชื่อ Service</th>
+                                    <th>สถานะ</th>
+                                    <th>ผู้ร้องขอ (Requester)</th>
+                                    <th>ผู้อนุมัติ (Approver)</th>
+                                    <th>อัปเดตล่าสุด</th>
+                                </tr>
+                            </thead>
+                            <tbody id="request-status-body">
+                                <!-- Dynamic Rows Go Here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Operational Health Section -->
+            <section id="health" class="mb-16 scroll-mt-24">
+                <h2 class="text-3xl font-bold mb-10 text-center" style="color: var(--color-header);">
+                    🚦 ภาพรวมระบบ (Health Dashboard)
+                </h2>
+                <p class="text-lg text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+                    Dashboard สำหรับติดตามตัวชี้วัดด้านความปลอดภัย (ISO 9.1) และ CI/CD Performance (DORA)
+                </p>
+
+                <!-- DORA Metrics -->
+                <h3 class="text-2xl font-semibold mb-6 text-center" style="color: var(--color-primary-800);">DORA Metrics (CI/CD Performance)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white rounded-lg shadow-lg p-6 border border-[var(--color-border)] col-span-1 md:col-span-2">
+                        <h3 class="text-xl font-semibold text-center mb-4" style="color: var(--color-header);">Deployment Frequency (Weekly)</h3>
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="doraDFChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3 class="stat-card-title">Lead Time for Changes</h3>
+                        <p id="dora-lt" class="stat-card-value">...</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 class="stat-card-title">Change Failure Rate</h3>
+                        <p id="dora-cfr" class="stat-card-value">...</p>
+                    </div>
+                     <div class="stat-card col-span-1 md:col-span-2 lg:col-span-4">
+                        <h3 class="stat-card-title">Mean Time to Restore (MTTR)</h3>
+                        <p id="dora-mttr" class="stat-card-value">...</p>
+                    </div>
+                </div>
+                
+                <!-- Security Health -->
+                <h3 class="text-2xl font-semibold mb-6 text-center" style="color: var(--color-primary-800);">Security & Compliance</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Certificate Status -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border border-[var(--color-border)]">
+                        <h3 class="text-xl font-semibold text-center mb-4" style="color: var(--color-header);">Certificate ใกล้หมดอายุ (30 วัน)</h3>
+                        <div class="overflow-y-auto max-h-96">
+                            <table class="min-w-full data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Domain Name</th>
+                                        <th>วันหมดอายุ</th>
+                                        <th>เหลือ (วัน)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="text-red-600 font-bold">
+                                        <td>*.apps.go.th</td>
+                                        <td>2025-11-15</td>
+                                        <td>16</td>
+                                    </tr>
+                                    <tr>
+                                        <td>cch.digitalgov.go.th</td>
+                                        <td>2025-11-28</td>
+                                        <td>29</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Vulnerability Status -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border border-[var(--color-border)]">
+                        <h3 class="text-xl font-semibold text-center mb-4" style="color: var(--color-header);">Vulnerability Status (ISO 9.1)</h3>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="vulnerabilitiesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- AWS Config -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border border-[var(--color-border)]">
+                        <h3 class="text-xl font-semibold text-center mb-4" style="color: var(--color-header);">AWS Config Compliance</h3>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="configChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- IAM Health -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border border-[var(--color-border)]">
+                        <h3 class="text-xl font-semibold text-center mb-4" style="color: var(--color-header);">IAM Health (AWS Security)</h3>
+                        <div class="space-y-4 pt-6">
+                            <div class="bg-gray-50 p-4 rounded-lg text-center border border-[var(--color-border)]">
+                                <p class="text-gray-600 text-sm">Access Keys > 90 วัน</p>
+                                <p class="text-3xl font-bold text-red-600" id="iam-keys">5</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg text-center border border-[var(--color-border)]">
+                                <p class="text-gray-600 text-sm">Users with MFA</p>
+                                <p class="text-3xl font-bold text-green-600" id="iam-mfa">95%</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg text-center border border-[var(--color-border)]">
+                                <p class="text-gray-600 text-sm">Root Account Access (30d)</p>
+                                <p class="text-3xl font-bold text-red-600" id="iam-root">2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="text-center text-gray-500 py-8 mt-12">
+            <p>© 2025 DevSecOps Platform Services</p>
+        </footer>
+    </div>
+
+    <!-- Service Request Modal -->
+    <div id="service-modal" class="hidden">
+        <div id="modal-backdrop" class="modal-backdrop"></div>
+        <div class="modal-panel">
+            <!-- Modal Header -->
+            <div class="modal-header flex justify-between items-center">
+                <div>
+                    <h2 id="modal-title" class="text-2xl font-bold" style="color: var(--color-header);"></h2>
+                    <p id="modal-description" class="text-gray-600 mt-1"></p>
+                </div>
+                <button id="modal-close-btn" class="text-gray-400 hover:text-gray-600 text-2xl p-2">&times;</button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div id="modal-body" class="modal-body">
+                <form id="modal-form">
+                    <!-- Dynamic Content (Form or Stepper) Goes Here -->
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Global Data ---
+        const environments = ['dev', 'sit', 'uat', 'pre-prod', 'prod'];
+        const envOptions = environments.map(e => `<option value="${e}">${e.toUpperCase()}</option>`).join('');
+
+        // Mock Project Inventory Data
+        const allProjectInventory = [
+            { id: 'my-awesome-app-prod', mainProject: 'miniapps', feature: 'my-awesome-app-api', organization: 'court', requester: 'เพชร', env: 'prod', status: 'DONE', dataClass: 'Confidential', residency: 'TH', albPath: '/cp/court/admincourt/api/*', repo: 'miniapps-admincourt-api', ecsService: 'miniapps-admincourt-api-prod' },
+            { id: 'my-awesome-app-dev', mainProject: 'miniapps', feature: 'my-awesome-app-fe', organization: 'court', requester: 'เพชร', env: 'dev', status: 'DONE', dataClass: 'Confidential', residency: 'TH', albPath: '/cp/court/admincourt/*', repo: 'miniapps-admincourt-fe', ecsService: 'miniapps-admincourt-fe-dev' },
+            { id: 'user-api-prod', mainProject: 'digitalid', feature: 'user-api-main', organization: 'dga', requester: 'ต้อม', env: 'prod', status: 'DONE', dataClass: 'PII', residency: 'TH', albPath: '/user/api/v2/*', repo: 'digitalid-user-api', ecsService: 'digitalid-user-api-prod' },
+            { id: 'user-api-uat', mainProject: 'digitalid', feature: 'user-api-main', organization: 'dga', requester: 'ต้อม', env: 'uat', status: 'DONE', dataClass: 'PII', residency: 'TH', albPath: '/user/api/v2/*', repo: 'digitalid-user-api', ecsService: 'digitalid-user-api-uat' },
+            { id: 'payment-gateway-prod', mainProject: 'bizportal', feature: 'payment-gateway-core', organization: 'biz', requester: 'เอกชัย', env: 'prod', status: 'Pending', dataClass: 'Confidential', residency: 'TH', albPath: '/payment/v1/*', repo: 'bizportal-payment-gateway', ecsService: 'bizportal-payment-gw-prod' },
+            { id: 'digital-inbox-dev', mainProject: 'digital-inbox', feature: 'digital-inbox-core-card', organization: 'dga', requester: 'ต้อม', env: 'dev', status: 'Pending', dataClass: 'Internal', residency: 'TH', albPath: '/card/api/*', repo: 'digital-inbox-core', ecsService: 'digital-inbox-core-card-api-dev' },
+            { id: 'public-opendata-prod', mainProject: 'cch', feature: 'public-opendata-api', organization: 'dga', requester: 'ทีม CCH', env: 'prod', status: 'DONE', dataClass: 'Public', residency: 'Global', albPath: '/opendata/*', repo: 'cch-opendata', ecsService: 'cch-opendata-prod' }
+        ];
+
+        // Mock Request Status Data
+        const myServiceRequests = [
+            { id: 'SR-1001', serviceType: 'สร้าง Service ใหม่', serviceName: 'new-payment-api', status: 'กำลังดำเนินการ', requester: 'UserA', approver: 'Admin-DevOps', lastUpdate: '2025-10-29' },
+            { id: 'SR-1002', serviceType: 'จัดการ GitHub & CI/CD', serviceName: 'miniapps-admincourt-api', status: 'รอการอนุมัติ', requester: 'UserB', approver: 'รออนุมัติ', lastUpdate: '2025-10-28' },
+            { id: 'SR-1003', serviceType: 'แจ้งเหตุฉุกเฉิน (Incident)', serviceName: 'digitalid-user-api-prod', status: 'ดำเนินการเสร็จสิ้น', requester: 'UserC', approver: 'Admin-SRE', lastUpdate: '2025-10-27' },
+             { id: 'SR-1004', serviceType: 'อัปเดต Service / Infra', serviceName: 'bizportal-payment-gw-prod', status: 'ดำเนินการเสร็จสิ้น', requester: 'UserA', approver: 'Admin-Infra', lastUpdate: '2025-10-28' }
+        ];
+        
+        // Mock Health & Dashboard Data
+        const healthData = {
+            vulnerabilities: { Critical: 15, High: 45, Medium: 120, Low: 300 },
+            config: { Compliant: 1960, 'Non-Compliant': 40 },
+            iam: { keys: 5, mfa: '95%', root: 2 },
+            dora: {
+                df: [5, 8, 7, 10], // Deployments per week (4 weeks)
+                lt: "2.5 Hours",
+                cfr: "5.2%",
+                mttr: "28 Mins"
+            }
+        };
+        
+        // Mock Request Analytics Data
+        const requestAnalyticsData = {
+            frequency: {
+                labels: ["สร้าง Service", "อัปเดต Infra", "GitHub/CI-CD", "สแกน SAST", "แจ้งเหตุฯ"],
+                data: [5, 12, 8, 7, 3]
+            },
+            duration: {
+                labels: ["สร้าง Service (SLA: 5)", "อัปเดต Infra (SLA: 2)", "GitHub (SLA: 1)", "แจ้งเหตุฯ (SLA: 0.25)"],
+                data: [4.5, 1.8, 0.8, 0.2]
+            }
+        };
+
+        // Service Detail Content Store
+        // ** UPDATED with new Friendly Names **
+        const serviceDetails = {
+            'onboard': {
+                title: '🚀 สร้าง Service ใหม่',
+                description: 'กรอกแบบฟอร์มนี้เพื่อร้องขอการสร้าง Service ใหม่ทั้งหมด (SLA: 5 working days)',
+                form: `
+                    <!-- Stepper Indicator -->
+                    <div class="stepper" id="onboard-stepper">
+                        <div class="step step-active" data-step="0">
+                            <div class="step-indicator">1</div>
+                            <div class="step-label">ข้อมูลพื้นฐาน</div>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step" data-step="1">
+                            <div class="step-indicator">2</div>
+                            <div class="step-label">Compliance & Security</div>
+                            <div class="step-line"></div>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-indicator">3</div>
+                            <div class="step-label">Technical Stack</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Step 1: Basic Info -->
+                        <fieldset class="form-step" data-step="0">
+                        
+                            <!-- Smart Onboarding Logic -->
+                            <div>
+                                <label class="form-label">ประเภทการ Onboard</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <label class="radio-label">
+                                        <input type="radio" name="onboard-type" value="new" class="form-radio" checked>
+                                        <span class="radio-content">
+                                            <strong>Project ใหม่ทั้งหมด</strong>
+                                            <span class="block text-xs text-gray-500">สร้าง Infra ใหม่ (WAF, ALB, VPC)</span>
+                                        </span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="onboard-type" value="existing" class="form-radio">
+                                        <span class="radio-content">
+                                            <strong>เพิ่ม Service ใน Project ที่มีอยู่</strong>
+                                            <span class="block text-xs text-gray-500">ใช้ Infra เดิม (เช่น miniapps)</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="existing-project-selector" class="hidden mb-6">
+                                <label for="existing-project" class="form-label">เลือก Project ที่มีอยู่ (Existing Project)</label>
+                                <select id="existing-project" name="existing-project" class="form-input">
+                                    <option value="miniapps">miniapps</option>
+                                    <option value="digitalid">digitalid</option>
+                                    <option value="bizportal">bizportal</option>
+                                    <option value="cch">cch</option>
+                                    <option value="digital-inbox">digital-inbox</option>
+                                </select>
+                            </div>
+                            <!-- End Smart Onboarding Logic -->
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="service-name" class="form-label">ชื่อ Service (e.g., my-new-app)</label>
+                                    <input type="text" name="service-name" id="service-name" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="service-owner" class="form-label">Service Owner / Team (ผู้อนุมัติ)</label>
+                                    <input type="text" name="service-owner" id="service-owner" placeholder="ระบุชื่อทีม หรือ ผู้รับผิดชอบ" class="form-input" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="github-repo" class="form-label">GitHub Repository (สำหรับ Service นี้)</label>
+                                    <input type="text" name="github-repo" id="github-repo" placeholder="เช่น miniapps-my-new-app-api" class="form-input">
+                                </div>
+                            </div>
+                            
+                            <fieldset class="form-fieldset mt-6">
+                                <legend class="form-legend">Template (ตาม All ECS list)</legend>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="service-function" class="form-label">ประเภท Service (Function)</label>
+                                        <select id="service-function" name="service-function" class="form-input">
+                                            <option>api</option><option>frontend</option><option>backend</option><option>worker</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="alb-path" class="form-label">ALB Path Pattern (e.g., /api/v1/*)</label>
+                                        <input type="text" name="alb-path" id="alb-path" placeholder="/api/v1/*" class="form-input">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label for="domain-name" class="form-label">Domain (Subdomain + Domain)</label>
+                                        <div class="flex mt-1">
+                                            <input type="text" name="subdomain" id="subdomain" placeholder="miniapps-dev" class="form-input rounded-r-none">
+                                            <input type="text" name="domain" id="domain" placeholder="opendata-dga.cloud" class="form-input rounded-l-none border-l-0">
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="form-fieldset mt-6">
+                                <legend class="form-legend">Environments (ที่ต้องการ)</legend>
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> dev</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> sit</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> uat</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> pre-prod</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> prod</label>
+                                </div>
+                            </fieldset>
+                        </fieldset>
+
+                        <!-- Step 2: Compliance & Security -->
+                        <fieldset class="form-step hidden" data-step="1">
+                             <fieldset class="form-fieldset border-blue-500">
+                                <legend class="form-legend text-blue-700">Compliance (NCSA & PDPA / ISO 27701)</legend>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="onboard-data-classification" class="form-label">Data Classification (NCSA)</label>
+                                        <select id="onboard-data-classification" class="form-input" required>
+                                            <option value="public">Public (ข้อมูลสาธารณะ)</option>
+                                            <option value="internal">Internal (ข้อมูลภายใน)</option>
+                                            <option value="confidential">Confidential (ข้อมูลลับ)</option>
+                                            <option value="pii">Personal Data (PII) (ข้อมูลส่วนบุคคล)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="onboard-data-residency" class="form-label">Data Residency (NCSA)</label>
+                                        <select id="onboard-data-residency" class="form-input" required>
+                                            <option value="TH">Thailand Only (บังคับจัดเก็บในประเทศ)</option>
+                                            <option value="Global">Global (อนุญาตจัดเก็บนอกประเทศ)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="pii-section" class="hidden space-y-4 mt-4">
+                                    <div>
+                                        <label for="onboard-pii-purpose" class="form-label text-red-700">Purpose of PII Processing (วัตถุประสงค์การประมวลผล PII)</label>
+                                        <textarea id="onboard-pii-purpose" rows="2" class="form-input" placeholder="อธิบายวัตถุประสงค์สั้นๆ..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="onboard-pii-pia" class="form-label text-red-700">Privacy Impact Assessment (PIA) Reference</label>
+                                        <input type="text" id="onboard-pii-pia" class="form-input" placeholder="Link to PIA document or ID">
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="form-label">Compliance Requirements (ข้อกำหนดที่เกี่ยวข้อง)</label>
+                                    <div class="flex flex-wrap gap-4 mt-2">
+                                        <label class="checkbox-label"><input type="checkbox" id="onboard-checkbox-pdpa" class="checkbox-input"> PDPA</label>
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> NCSA</label>
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> PCI-DSS</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="form-fieldset border-yellow-500 mt-6">
+                                <legend class="form-legend text-yellow-700">AWS Security (Least Privilege)</legend>
+                                <div class="space-y-3">
+                                    <label class="form-label mb-2">Service Access Needs (Role Preset)</label>
+                                    
+                                    <label class="radio-label">
+                                        <input type="radio" name="iam-role" value="none" class="form-radio" checked>
+                                        <span class="radio-content">
+                                            <strong>No AWS Service Access:</strong> (e.g., Frontend app, talks to other APIs)
+                                        </span>
+                                    </label>
+                                    
+                                    <label class="radio-label">
+                                        <input type="radio" name="iam-role" value="read" class="form-radio">
+                                        <span class="radio-content">
+                                            <strong>Read-Only Access:</strong> (e.g., Read from S3, Read from Redis)
+                                        </span>
+                                    </label>
+
+                                    <label class="radio-label">
+                                        <input type="radio" name="iam-role" value="readwrite" class="form-radio">
+                                        <span class="radio-content">
+                                            <strong>Read/Write Access:</strong> (e.g., Read/Write to S3, Write to DynamoDB)
+                                        </span>
+                                    </label>
+
+                                    <label class="radio-label">
+                                        <input type="radio" name="iam-role" value="custom" class="form-radio">
+                                        <span class="radio-content">
+                                            <strong>Custom...</strong> (ระบุสิทธิ์ที่ต้องการด้านล่าง)
+                                        </span>
+                                    </label>
+
+                                    <div id="iam-custom-section" class="hidden pt-2">
+                                        <label for="onboard-iam-other" class="form-label">สิทธิ์ที่ต้องการ (Specifics)</label>
+                                        <textarea id="onboard-iam-other" rows="3" class="form-input" placeholder="เช่น: Read-only access to S3 bucket 'my-bucket-name'"></textarea>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </fieldset>
+                        
+                        <!-- Step 3: Technical Stack -->
+                        <fieldset class="form-step hidden" data-step="2">
+                        
+                            <!-- Wrapper for Shared Infra -->
+                            <div id="shared-infra-group">
+                                <fieldset class="form-fieldset">
+                                    <legend class="form-legend">AWS Components (Shared Project Infra)</legend>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> WAF</label>
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> CloudFront</label>
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> ALB</label>
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> NLB</label>
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> API GW</label>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="form-fieldset mt-6">
+                                    <legend class="form-legend">Database (Shared Project Infra)</legend>
+                                    <div class="flex space-x-6">
+                                        <label class="checkbox-label"><input type="radio" name="mongo-type" class="checkbox-input"> MongoDB (Sharding)</label>
+                                        <label class="checkbox-label"><input type="radio" name="mongo-type" class="checkbox-input"> MongoDB (Replica)</label>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset class="form-fieldset mt-6">
+                                    <legend class="form-legend">Network (Shared Project Infra)</legend>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Need GIN</label>
+                                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> VPN Peering</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <!-- End Shared Infra Wrapper -->
+
+                            <!-- Service-Specific Infra (Always Visible) -->
+                            <fieldset class="form-fieldset">
+                                <legend class="form-legend">AWS Components (Service-Specific)</legend>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Redis (Service Cache)</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> ECS (New Service)</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> ECR (New Image)</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> S3 (Service Bucket)</label>
+                                </div>
+                                <label for="aws-other" class="form-label mt-4">AWS อื่นๆ (สำหรับ Service นี้)</label>
+                                <input type="text" name="aws-other" id="aws-other" class="form-input">
+                            </fieldset>
+                            
+                            <fieldset class="form-fieldset mt-6">
+                                <legend class="form-legend">Network (Service-Specific)</legend>
+                                <label for="network-other" class="form-label">Network อื่นๆ (สำหรับ Service นี้)</label>
+                                <input type="text" name="network-other" id="network-other" class="form-input" placeholder="e.g., Need to connect to external API at IP ...">
+                            </fieldset>
+
+                            <fieldset class="form-fieldset mt-6">
+                                <legend class="form-legend">Monitoring (Service-Specific)</legend>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> DataDog APM</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Log (DataDog)</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Alert (DataDog)</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> UptimeKuma</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> RedisInsight</label>
+                                </div>
+                                <label for="monitor-other" class="form-label mt-4">Monitoring อื่นๆ</label>
+                                <input type="text" name="monitor-other" id="monitor-other" class="form-input">
+                            </fieldset>
+                        </fieldset>
+                    </div>
+
+                    <!-- Stepper Navigation -->
+                    <div class="modal-footer flex justify-between items-center">
+                        <button type="button" id="stepper-prev" class="btn btn-secondary hidden">ย้อนกลับ</button>
+                        <button type="button" id="stepper-next" class="btn btn-primary ml-auto">ถัดไป</button>
+                        <button type="submit" id="stepper-submit" class="btn btn-primary ml-auto hidden">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'manage-github': {
+                title: '⚙️ จัดการ GitHub & CI/CD',
+                description: 'ร้องขอการเปลี่ยนแปลงหรือสร้าง GitHub Repository (SLA: 1 working day)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="request-type-github" class="form-label">ประเภทคำขอ</label>
+                            <select id="request-type-github" name="request-type-github" class="form-input">
+                                <option>สร้าง GitHub Repo ใหม่</option>
+                                <option>จัดการ CI/CD (GitHub Actions)</option>
+                                <option>จัดการ Permission / CODEOWNERS</option>
+                                <option>จัดการ Actions Secrets</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="repo-name" class="form-label">ชื่อ GitHub Repo (ถ้ามี)</label>
+                            <input type="text" name="repo-name" id="repo-name" placeholder="e.g., miniapps-admincourt-api" class="form-input">
+                        </div>
+                        <div>
+                            <label for="github-details" class="form-label">รายละเอียด</label>
+                            <textarea id="github-details" name="github-details" rows="3" class="form-input" placeholder="เช่น: ขอสร้าง repo ใหม่ชื่อ ..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-primary w-full">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'infra-change': {
+                title: '🏗️ อัปเดต Service / Infra',
+                description: 'ร้องขอการเปลี่ยนแปลงทรัพยากร (Update) สำหรับ Service ที่มีอยู่แล้ว (SLA: 2 working days)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="service-name-change" class="form-label">ชื่อ Service ที่ต้องการเปลี่ยนแปลง (จากตาราง Inventory)</label>
+                            <input type="text" name="service-name-change" id="service-name-change" placeholder="e.g., miniapps-admincourt-api-prod" class="form-input">
+                        </div>
+                         <div>
+                            <label for="service-owner-change" class="form-label">Service Owner (ผู้อนุมัติ)</label>
+                            <input type="text" name="service-owner-change" id="service-owner-change" placeholder="ระบุชื่อผู้อนุมัติการเปลี่ยนแปลงนี้ (ISO 27001)" class="form-input">
+                        </div>
+                        
+                        <fieldset class="form-fieldset border-gray-300">
+                            <legend class="form-legend text-gray-700">ISO 20000 Change Control</legend>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="change-reason" class="form-label">Reason for Change (เหตุผลในการเปลี่ยนแปลง)</label>
+                                    <textarea id="change-reason" name="change-reason" rows="2" class="form-input" placeholder="เช่น: 'เพิ่มประสิทธิภาพ', 'แก้ไข Bug'"></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="change-risk" class="form-label">Risk Assessment</label>
+                                        <select id="change-risk" name="change-risk" class="form-input">
+                                            <option value="low">Low (ไม่มีผลกระทบ)</option>
+                                            <option value="medium">Medium (อาจมี Downtime)</option>
+                                            <option value="high">High (มีความเสี่ยงสูง)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="change-backout" class="form-label">Backout Plan (แผน Rollback)</label>
+                                        <input type="text" id="change-backout" name="change-backout" class="form-input" placeholder="เช่น: 'Rollback to previous tag'">
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="form-fieldset border-yellow-500">
+                            <legend class="form-legend text-yellow-700">AWS Security & Compliance Check</legend>
+                            <div>
+                                <label for="infra-network" class="form-label">Security Group / Network Impact (AWS Security)</label>
+                                <textarea id="infra-network" rows="2" class="form-input" placeholder="e.g., No change. OR Need to open port 8080..."></textarea>
+                            </div>
+                            <div class="mt-4">
+                                <label class="form-label">Data Encryption (AWS Security)</label>
+                                <div class="flex flex-wrap gap-4 mt-2">
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input" checked disabled> Data in Transit (TLS)</label>
+                                    <label class="checkbox-label"><input type="checkbox" class="checkbox-input" checked disabled> Data at Rest (KMS)</label>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <label for="infra-compliance" class="form-label">Compliance Check (NCSA / PDPA)</label>
+                                <textarea id="infra-compliance" rows="2" class="form-input" placeholder="Does this change impact data residency or PII? (e.g., No impact.)"></textarea>
+                            </div>
+                        </fieldset>
+
+                        <div>
+                            <label for="change-details" class="form-label">รายละเอียดการเปลี่ยนแปลง (Configuration)</label>
+                            <textarea id="change-details" name="change-details" rows="3" class="form-input" placeholder="โปรดระบุรายละเอียด Config ให้ชัดเจน..."></textarea>
+                        </div>
+                    </div>
+                     <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-primary w-full">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'security-sast': {
+                title: '🛡️ ตรวจความปลอดภัยโค้ด (SAST)',
+                description: 'สั่งสแกน Static Analysis (SAST) on-demand (SLA: 1 working day)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="repo-url-sast" class="form-label">GitHub Repository (e.g., miniapps-admincourt-api)</label>
+                            <input type="text" name="repo-url-sast" id="repo-url-sast" class="form-input">
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-primary w-full">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'security-dast': {
+                title: '📡 ตรวจความปลอดภัยเว็บ (DAST)',
+                description: 'สั่งสแกน Dynamic Analysis (DAST) on-demand (SLA: 1 working day)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="target-url-dast" class="form-label">Target URL (e.g., https://my-app.go.th)</label>
+                            <input type="text" name="target-url-dast" id="target-url-dast" class="form-input">
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-primary w-full">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'security-container': {
+                title: '📦 ตรวจความปลอดภัย Container (ECR)',
+                description: 'สั่งสแกนช่องโหว่ (CVEs) ใน Container Image (ISO 27001: A.5.23)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="ecr-repo" class="form-label">ECR Repository URI</label>
+                            <input type="text" name="ecr-repo" id="ecr-repo" class="form-input" placeholder="123456789012.dkr.ecr.region.amazonaws.com/my-repo">
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-primary w-full">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'security-secrets': {
+                title: '🔑 ตรวจหา Secrets ในโค้ด',
+                description: 'สั่งสแกนหา Credentials หรือ Secrets ที่หลุดใน Source Code (ISO 27001: A.8.12)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="repo-url-secrets" class="form-label">GitHub Repository (e.g., miniapps-admincourt-api)</label>
+                            <input type="text" name="repo-url-secrets" id="repo-url-secrets" class="form-input">
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-primary w-full">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'manage-cert': {
+                title: '📜 ขอ/ต่ออายุ Certificate',
+                description: 'ร้องขอ Certificate (ACM) ใหม่สำหรับ Domain หรือตรวจสอบวันหมดอายุ (SLA: 3 working days)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="domain-name-cert" class="form-label">Domain Name</label>
+                            <input type="text" name="domain-name-cert" id="domain-name-cert" placeholder="e.g., myapp.superapps-th.cloud" class="form-input">
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-primary w-full">ส่งคำขอ</button>
+                    </div>
+                `
+            },
+            'incident': {
+                title: '🔥 แจ้งเหตุฉุกเฉิน (Incident)',
+                description: 'ใช้แบบฟอร์มนี้เพื่อแจ้งเหตุเร่งด่วน หรือระบบไม่สามารถใช้งานได้ (SLA: 15 min response for P1)',
+                form: `
+                    <div class="space-y-4">
+                        <div>
+                            <label for="service-name-incident" class="form-label">ชื่อ Service ที่มีปัญหา (จากตาราง Inventory)</label>
+                            <input type="text" name="service-name-incident" id="service-name-incident" placeholder="e.g., miniapps-admincourt-api-prod" class="form-input">
+                        </div>
+                        <div>
+                            <label for="severity-incident" class="form-label">ระดับความรุนแรง (Severity)</label>
+                            <select id="severity-incident" name="severity-incident" class="form-input">
+                                <option value="p1" class="text-red-600 font-bold">P1 - Critical (ระบบล่ม / ใช้งานไม่ได้)</option>
+                                <option value="p2" class="text-orange-600 font-semibold">P2 - High (ฟีเจอร์หลักใช้งานไม่ได้)</option>
+                                <option value="p3" class="text-yellow-600">P3 - Medium (มีผลกระทบ แต่ยังใช้งานได้)</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label for="incident-impact" class="form-label">Business Impact (ผลกระทบต่อผู้ใช้)</label>
+                            <input type="text" name="incident-impact" id="incident-impact" placeholder="เช่น 'ผู้ใช้ Login ไม่ได้'" class="form-input">
+                        </div>
+                        <div>
+                            <label for="incident-details" class="form-label">รายละเอียด / อาการที่พบ</label>
+                            <textarea id="incident-details" name="incident-details" rows="4" class="form-input" placeholder="โปรดระบุ: 1. เห็นอะไร (อาการ) 2. คาดหวังอะไร 3. Error message (ถ้ามี)"></textarea>
+                        </div>
+                        <div class="pt-2">
+                             <label class="checkbox-label text-red-700 font-semibold">
+                                <input type="checkbox" id="incident-pii" class="checkbox-input border-red-400">
+                                Data Breach / PII Impacted? (ISO 27701 / PDPA)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-6">
+                         <button type="submit" class="btn btn-danger w-full">แจ้งเหตุฉุกเฉิน</button>
+                    </div>
+                `
+            }
+        };
+
+
+        window.onload = function() {
+            let currentOnboardStep = 0;
+            let onboardFormSteps = [];
+            let stepperIndicators = [];
+
+            // --- Chart.js Setup ---
+            const palette = {
+                red: '#EF4444',
+                yellow: '#F59E0B',
+                green: '#10B981',
+                blue: '#3B82F6',
+                primary: '#4F46E5',
+                build: '#7C3AED',
+                react: '#EF4444',
+                secure: '#10B981',
+                deploy: '#3B82F6',
+            };
+
+            const tooltipTitleCallback = (tooltipItems) => {
+              const item = tooltipItems[0];
+              let label = item.chart.data.labels[item.dataIndex];
+              return Array.isArray(label) ? label.join(' ') : label;
+            };
+
+            const commonTooltipOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: { callbacks: { title: tooltipTitleCallback } },
+                    legend: { position: 'bottom' }
+                }
+            };
+
+            // --- Render ALL Charts ---
+
+            // Health: Vulnerabilities
+            var ctxVuln = document.getElementById('vulnerabilitiesChart');
+            if(ctxVuln) new Chart(ctxVuln, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low'],
+                    datasets: [{
+                        data: [healthData.vulnerabilities.Critical, healthData.vulnerabilities.High, healthData.vulnerabilities.Medium, healthData.vulnerabilities.Low],
+                        backgroundColor: [palette.red, palette.yellow, palette.blue, palette.green],
+                        hoverOffset: 4
+                    }]
+                },
+                options: commonTooltipOptions
+            });
+
+            // Health: Config Compliance
+            var ctxConfig = document.getElementById('configChart');
+            if(ctxConfig) new Chart(ctxConfig, {
+                type: 'bar',
+                data: {
+                    labels: ['AWS Resources'],
+                    datasets: [
+                        { label: 'Compliant', data: [healthData.config.Compliant], backgroundColor: palette.green },
+                        { label: 'Non-Compliant', data: [healthData.config['Non-Compliant']], backgroundColor: palette.red }
+                    ]
+                },
+                options: { ...commonTooltipOptions, indexAxis: 'y', scales: { x: { stacked: true }, y: { stacked: true } } }
+            });
+            
+            // Health: IAM Stats
+            const iamKeys = document.getElementById('iam-keys');
+            const iamMfa = document.getElementById('iam-mfa');
+            const iamRoot = document.getElementById('iam-root');
+            if(iamKeys) iamKeys.innerText = healthData.iam.keys;
+            if(iamMfa) iamMfa.innerText = healthData.iam.mfa;
+            if(iamRoot) iamRoot.innerText = healthData.iam.root;
+
+            // Health: DORA Metrics
+            const doraLT = document.getElementById('dora-lt');
+            const doraCFR = document.getElementById('dora-cfr');
+            const doraMTTR = document.getElementById('dora-mttr');
+            if(doraLT) doraLT.innerText = healthData.dora.lt;
+            if(doraCFR) doraCFR.innerText = healthData.dora.cfr;
+            if(doraMTTR) doraMTTR.innerText = healthData.dora.mttr;
+            
+            var ctxDoraDF = document.getElementById('doraDFChart');
+            if(ctxDoraDF) new Chart(ctxDoraDF, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Deployments',
+                        data: healthData.dora.df,
+                        borderColor: palette.primary,
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: { ...commonTooltipOptions, plugins: { ...commonTooltipOptions.plugins, legend: { display: false } } }
+            });
+            
+            // Request Dashboard Charts
+            var ctxReqFreq = document.getElementById('requestFreqChart');
+            if(ctxReqFreq) new Chart(ctxReqFreq, {
+                type: 'bar',
+                data: {
+                    labels: requestAnalyticsData.frequency.labels,
+                    datasets: [{
+                        label: 'จำนวนคำขอ',
+                        data: requestAnalyticsData.frequency.data,
+                        backgroundColor: [palette.primary, palette.deploy, palette.build, palette.secure, palette.react],
+                    }]
+                },
+                options: { ...commonTooltipOptions, plugins: { ...commonTooltipOptions.plugins, legend: { display: false } } }
+            });
+            
+            var ctxReqTime = document.getElementById('requestTimeChart');
+            if(ctxReqTime) new Chart(ctxReqTime, {
+                type: 'bar',
+                data: {
+                    labels: requestAnalyticsData.duration.labels,
+                    datasets: [{
+                        label: 'เวลาเฉลี่ย (วัน)',
+                        data: requestAnalyticsData.duration.data,
+                        backgroundColor: [palette.primary, palette.deploy, palette.build, palette.react],
+                    }]
+                },
+                options: { ...commonTooltipOptions, indexAxis: 'y', plugins: { ...commonTooltipOptions.plugins, legend: { display: false } } }
+            });
+
+
+            // --- Sticky Nav Logic ---
+            const stickyNav = document.getElementById('sticky-nav');
+            if (stickyNav) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 0) {
+                        stickyNav.classList.add('scrolled');
+                    } else {
+                        stickyNav.classList.remove('scrolled');
+                    }
+                });
+            }
+
+            // --- Modal Logic ---
+            const serviceModal = document.getElementById('service-modal');
+            const modalBackdrop = document.getElementById('modal-backdrop');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalForm = document.getElementById('modal-form');
+            const catalogSection = document.getElementById('service-catalog');
+
+            const hideModal = () => {
+                if (serviceModal) serviceModal.classList.add('hidden');
+            };
+
+            const showModal = (serviceId) => {
+                const service = serviceDetails[serviceId];
+                if (!service || !serviceModal) return;
+
+                modalTitle.innerText = service.title;
+                modalDescription.innerText = service.description;
+                modalForm.innerHTML = service.form;
+
+                // Handle Incident modal styling
+                if (serviceId === 'incident') {
+                    modalTitle.classList.add('text-red-600');
+                } else {
+                    modalTitle.classList.remove('text-red-600');
+                }
+                
+                serviceModal.classList.remove('hidden');
+
+                // ** Initialize Stepper for 'onboard' service **
+                if (serviceId === 'onboard') {
+                    initStepper();
+                    
+                    // --- Add All Onboard Form Event Listeners ---
+                    
+                    // Smart Onboarding Logic
+                    const onboardTypeRadios = modalForm.querySelectorAll('input[name="onboard-type"]');
+                    const existingProjectSelector = document.getElementById('existing-project-selector');
+                    const sharedInfraGroup = document.getElementById('shared-infra-group');
+                    
+                    if (onboardTypeRadios.length > 0 && existingProjectSelector && sharedInfraGroup) {
+                        onboardTypeRadios.forEach(radio => {
+                            radio.addEventListener('change', (e) => {
+                                if (e.target.value === 'existing') {
+                                    existingProjectSelector.classList.remove('hidden');
+                                    sharedInfraGroup.classList.add('hidden');
+                                } else { // 'new'
+                                    existingProjectSelector.classList.add('hidden');
+                                    sharedInfraGroup.classList.remove('hidden');
+                                }
+                            });
+                        });
+                        // Set initial state
+                        sharedInfraGroup.classList.remove('hidden');
+                        existingProjectSelector.classList.add('hidden');
+G                   }
+
+                    // PII Section Logic
+                    const onboardDataClassification = document.getElementById('onboard-data-classification');
+                    if (onboardDataClassification) {
+                        onboardDataClassification.addEventListener('change', (e) => {
+                            const piiSection = document.getElementById('pii-section');
+                            const pdpaCheckbox = document.getElementById('onboard-checkbox-pdpa');
+                            if (piiSection && pdpaCheckbox) {
+                                if (e.target.value === 'pii') {
+                                    piiSection.classList.remove('hidden');
+                                    pdpaCheckbox.checked = true;
+                                    pdpaCheckbox.disabled = true;
+                                } else {
+                                    piiSection.classList.add('hidden');
+                                    pdpaCheckbox.checked = false;
+                                    pdpaCheckbox.disabled = false;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // IAM Role (Least Privilege) Logic
+                    const iamRoleRadios = modalForm.querySelectorAll('input[name="iam-role"]');
+                    const iamCustomSection = document.getElementById('iam-custom-section');
+                    if (iamRoleRadios.length > 0 && iamCustomSection) {
+                        iamRoleRadios.forEach(radio => {
+                            radio.addEventListener('change', (e) => {
+                                if (e.target.value === 'custom') {
+                                    iamCustomSection.classList.remove('hidden');
+                                } else {
+                                    iamCustomSection.classList.add('hidden');
+                                }
+                            });
+                        });
+                    }
+                }
+            };
+            
+            // --- Onboard Stepper Logic ---
+            const initStepper = () => {
+                currentOnboardStep = 0;
+                onboardFormSteps = modalForm.querySelectorAll('.form-step');
+                stepperIndicators = modalForm.querySelectorAll('.stepper .step');
+                const prevBtn = document.getElementById('stepper-prev');
+                const nextBtn = document.getElementById('stepper-next');
+                const submitBtn = document.getElementById('stepper-submit');
+
+                const showStep = (stepIndex) => {
+                    // Hide all steps
+                    onboardFormSteps.forEach(step => step.classList.add('hidden'));
+                    // Show current step
+                    const currentStepEl = modalForm.querySelector(`.form-step[data-step="${stepIndex}"]`);
+                    if(currentStepEl) currentStepEl.classList.remove('hidden');
+
+                    // Update stepper indicators
+                    stepperIndicators.forEach((index, i) => {
+                        const stepEl = modalForm.querySelector(`.stepper .step[data-step="${i}"]`);
+                        if (!stepEl) return;
+                        stepEl.classList.remove('step-active', 'step-completed');
+                        if (i < stepIndex) {
+                            stepEl.classList.add('step-completed');
+                        } else if (i === stepIndex) {
+                            stepEl.classList.add('step-active');
+                        }
+                    });
+
+                    // Update button visibility
+                    prevBtn.classList.toggle('hidden', stepIndex === 0);
+                    nextBtn.classList.toggle('hidden', stepIndex === onboardFormSteps.length - 1);
+                    submitBtn.classList.toggle('hidden', stepIndex !== onboardFormSteps.length - 1);
+                };
+
+                nextBtn.addEventListener('click', () => {
+                    if (currentOnboardStep < onboardFormSteps.length - 1) {
+                        currentOnboardStep++;
+                        showStep(currentOnboardStep);
+                    }
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    if (currentOnboardStep > 0) {
+                        currentOnboardStep--;
+                        showStep(currentOnboardStep);
+                    }
+                });
+                
+                showStep(0); // Show first step initially
+            };
+
+            // Modal Event Listeners
+            if (catalogSection) {
+                catalogSection.addEventListener('click', (e) => {
+                    const card = e.target.closest('.service-card');
+                    if (card && card.dataset.serviceId) {
+                        showModal(card.dataset.serviceId);
+                    }
+                });
+            }
+            if (modalBackdrop) modalBackdrop.addEventListener('click', hideModal);
+            if (modalCloseBtn) modalCloseBtn.addEventListener('click', hideModal);
+            
+
+            // --- Inventory Table Logic ---
+            const inventoryTableBody = document.getElementById('inventory-table-body');
+            const searchInput = document.getElementById('inventory-search');
+            const projectFilter = document.getElementById('inventory-project-filter');
+            const dataClassFilter = document.getElementById('inventory-data-class-filter');
+            const statusFilter = document.getElementById('inventory-status-filter');
+
+            const getDataClassBadge = (dataClass) => {
+                switch (dataClass) {
+                    case 'PII': return `<span class="badge badge-red-bg">PII</span>`;
+                    case 'Confidential': return `<span class="badge badge-yellow-bg">Confidential</span>`;
+                    case 'Internal': return `<span class="badge badge-blue-bg">Internal</span>`;
+                    case 'Public': return `<span class="badge badge-green-bg">Public</span>`;
+                    default: return `<span class="badge badge-gray-bg">${dataClass || 'N/A'}</span>`;
+                }
+            };
+            const getResidencyBadge = (residency) => {
+                return residency === 'TH' 
+                    ? `<span class="badge badge-blue-bg">Thailand</span>` 
+                    : `<span class="badge badge-gray-bg">Global</span>`;
+            };
+
+            const renderInventoryTable = () => {
+                if (!inventoryTableBody) return;
+                const searchTerm = searchInput.value.toLowerCase();
+                const projectValue = projectFilter.value;
+                const dataClassValue = dataClassFilter.value;
+                const statusValue = statusFilter.value;
+
+                inventoryTableBody.innerHTML = '';
+                const filteredData = allProjectInventory.filter(item => {
+                    const matchesSearch = searchTerm === '' ||
+                                        item.feature.toLowerCase().includes(searchTerm) ||
+                                        item.repo.toLowerCase().includes(searchTerm) ||
+                                        item.albPath.toLowerCase().includes(searchTerm) ||
+                                        item.requester.toLowerCase().includes(searchTerm) ||
+                                        item.ecsService.toLowerCase().includes(searchTerm);
+                    const matchesProject = !projectValue || item.mainProject === projectValue;
+                    const matchesDataClass = !dataClassValue || item.dataClass === dataClassValue;
+                    const matchesStatus = !statusValue || item.status === statusValue;
+                    return matchesSearch && matchesProject && matchesDataClass && matchesStatus;
+                });
+
+                if (filteredData.length === 0) {
+                    inventoryTableBody.innerHTML = `<tr><td colspan="10" class="text-center text-gray-500 py-4">ไม่พบข้อมูลที่ตรงกัน</td></tr>`;
+                    return;
+                }
+
+                filteredData.forEach(item => {
+                    const statusClass = item.status === 'DONE' ? 'status-done' : 'status-pending';
+                    inventoryTableBody.innerHTML += `
+                        <tr>
+                            <td class="font-semibold" style="color: var(--color-primary-800);">${item.feature}</td>
+                            <td>${item.mainProject}</td>
+                            <td>${item.requester}</td>
+                            <td><span class="${statusClass}">${item.status}</span></td>
+                            <td>${getDataClassBadge(item.dataClass)}</td>
+                            <td>${getResidencyBadge(item.residency)}</td>
+                            <td>${item.env.toUpperCase()}</td>
+                            <td class="font-mono text-sm">${item.albPath}</td>
+                            <td class="text-sm"><a href="#" class="text-blue-600 hover:underline">${item.repo}</a></td>
+                            <td class="text-xs truncate" style="max-width: 150px;">${item.ecsService}</td>
+                        </tr>
+                    `;
+                });
+            };
+
+            // Request Status Table Logic
+            const requestStatusBody = document.getElementById('request-status-body');
+            const getStatusBadge = (status) => {
+                switch (status) {
+                    case 'รอการอนุมัติ': return `<span class="status-badge status-pending-bg">${status}</span>`;
+                    case 'กำลังดำเนินการ': return `<span class="status-badge status-progress-bg">${status}</span>`;
+                    case 'ดำเนินการเสร็จสิ้น': return `<span class="status-badge status-completed-bg">${status}</span>`;
+                    default: return `<span>${status}</span>`;
+                }
+            };
+
+            const renderRequestStatusTable = () => {
+                if (!requestStatusBody) return;
+                requestStatusBody.innerHTML = '';
+                if (myServiceRequests.length === 0) {
+                    requestStatusBody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 py-4">ไม่พบคำขอล่าสุด</td></tr>`;
+                    return;
+                }
+                myServiceRequests.forEach(req => {
+                    requestStatusBody.innerHTML += `
+                        <tr>
+                            <td class="font-semibold" style="color: var(--color-primary-800);">${req.id}</td>
+                            <td>${req.serviceType}</td>
+                            <td>${req.serviceName}</td>
+                            <td>${getStatusBadge(req.status)}</td>
+                            <td>${req.requester}</td>
+                            <td>${req.approver}</td>
+                            <td>${req.lastUpdate}</td>
+                        </tr>
+                    `;
+                });
+            };
+
+            // Event Listeners for filters
+            if(searchInput) searchInput.addEventListener('input', renderInventoryTable);
+            if(projectFilter) projectFilter.addEventListener('change', renderInventoryTable);
+            if(dataClassFilter) dataClassFilter.addEventListener('change', renderInventoryTable);
+            if(statusFilter) statusFilter.addEventListener('change', renderInventoryTable);
+
+            // Initial render
+            renderInventoryTable();
+            renderRequestStatusTable();
+        };
+    </script>
+
+</body>
+</html>
+
