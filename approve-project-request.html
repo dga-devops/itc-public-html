@@ -539,6 +539,37 @@
                             <label for="budget-amount" class="form-label">จำนวนเงินทั้งหมด (บาท) <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="budget-amount" required placeholder="เช่น 5000000" min="0" step="1000">
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="budget-start-month" class="form-label">เดือนเริ่มต้นงบประมาณ <span class="text-danger">*</span></label>
+                                <select class="form-select" id="budget-start-month" required>
+                                    <option value="">เลือกเดือน</option>
+                                    <option value="1">มกราคม</option>
+                                    <option value="2">กุมภาพันธ์</option>
+                                    <option value="3">มีนาคม</option>
+                                    <option value="4">เมษายน</option>
+                                    <option value="5">พฤษภาคม</option>
+                                    <option value="6">มิถุนายน</option>
+                                    <option value="7">กรกฎาคม</option>
+                                    <option value="8">สิงหาคม</option>
+                                    <option value="9">กันยายน</option>
+                                    <option value="10" selected>ตุลาคม</option>
+                                    <option value="11">พฤศจิกายน</option>
+                                    <option value="12">ธันวาคม</option>
+                                </select>
+                                <small class="form-text text-muted">งบประมาณ DGA เริ่มเดือนตุลาคม</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="budget-duration" class="form-label">ระยะเวลา (เดือน) <span class="text-danger">*</span></label>
+                                <select class="form-select" id="budget-duration" required>
+                                    <option value="">เลือกระยะเวลา</option>
+                                    <option value="3">3 เดือน</option>
+                                    <option value="4">4 เดือน</option>
+                                    <option value="6">6 เดือน</option>
+                                    <option value="12" selected>12 เดือน (1 ปี)</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label for="budget-description" class="form-label">รายละเอียด</label>
                             <textarea class="form-control" id="budget-description" rows="2" placeholder="รายละเอียดเพิ่มเติมของงบประมาณ"></textarea>
@@ -548,6 +579,66 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
                     <button type="button" class="btn btn-success" id="save-budget">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Budget Details Modal -->
+    <div class="modal fade" id="budgetDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-cash-stack text-success"></i>
+                        <span id="budget-details-title">รายละเอียดงบประมาณ</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="info-label">ปีงบประมาณ</div>
+                            <div class="info-value" id="budget-details-year">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">ระยะเวลา</div>
+                            <div class="info-value" id="budget-details-period">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="info-label">งบประมาณทั้งหมด</div>
+                            <div class="info-value text-primary fw-bold" id="budget-details-total">-</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">งบประมาณที่จัดสรร</div>
+                            <div class="info-value text-warning fw-bold" id="budget-details-allocated">-</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">งบประมาณคงเหลือ</div>
+                            <div class="info-value text-success fw-bold" id="budget-details-remaining">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="info-label">รายละเอียด</div>
+                        <div class="info-value" id="budget-details-description">-</div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="mb-3">
+                        <i class="bi bi-folder-fill text-primary"></i>
+                        โครงการที่ใช้งบประมาณนี้
+                    </h6>
+                    <div id="budget-projects-list">
+                        <p class="text-muted">ยังไม่มีโครงการที่ใช้งบประมาณนี้</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
                 </div>
             </div>
         </div>
@@ -564,7 +655,9 @@
                 year: 2567,
                 totalAmount: 10000000,
                 allocatedAmount: 3000000,
-                description: "งบประมาณสำหรับโครงการ IT ประจำปี 2567"
+                description: "งบประมาณสำหรับโครงการ IT ประจำปี 2567",
+                startMonth: 10, // October (DGA budget year starts in October)
+                durationMonths: 12 // 1 year
             },
             {
                 id: 2,
@@ -572,7 +665,9 @@
                 year: 2567,
                 totalAmount: 5000000,
                 allocatedAmount: 1500000,
-                description: "งบประมาณพัฒนาระบบไตรมาสที่ 1"
+                description: "งบประมาณพัฒนาระบบไตรมาสที่ 1",
+                startMonth: 10, // October
+                durationMonths: 3 // 3 months
             },
             {
                 id: 3,
@@ -580,7 +675,9 @@
                 year: 2567,
                 totalAmount: 15000000,
                 allocatedAmount: 12000000,
-                description: "งบประมาณสำหรับโครงการ Digital Transformation"
+                description: "งบประมาณสำหรับโครงการ Digital Transformation",
+                startMonth: 10, // October
+                durationMonths: 12 // 1 year
             }
         ];
         
@@ -1055,7 +1152,7 @@
                 const progressClass = percentUsed > 90 ? 'danger' : percentUsed > 70 ? 'warning' : '';
                 
                 return `
-                    <div class="budget-item" data-budget-id="${budget.id}">
+                    <div class="budget-item" data-budget-id="${budget.id}" onclick="showBudgetDetails(${budget.id})">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="flex-grow-1">
                                 <div class="fw-bold small">${budget.name}</div>
@@ -1116,6 +1213,8 @@
             document.getElementById('budgetModalTitle').textContent = 'เพิ่มงบประมาณใหม่';
             document.getElementById('budget-form').reset();
             document.getElementById('budget-year').value = new Date().getFullYear() + 543; // Thai year
+            document.getElementById('budget-start-month').value = '10'; // October by default
+            document.getElementById('budget-duration').value = '12'; // 12 months by default
             
             // Show modal using vanilla JS
             const modalElement = document.getElementById('budgetModal');
@@ -1152,8 +1251,10 @@
             const year = parseInt(document.getElementById('budget-year').value);
             const amount = parseFloat(document.getElementById('budget-amount').value);
             const description = document.getElementById('budget-description').value.trim();
+            const startMonth = parseInt(document.getElementById('budget-start-month').value);
+            const durationMonths = parseInt(document.getElementById('budget-duration').value);
             
-            if (!name || !year || !amount) {
+            if (!name || !year || !amount || !startMonth || !durationMonths) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วน');
                 return;
             }
@@ -1169,6 +1270,8 @@
                 currentEditingBudget.year = year;
                 currentEditingBudget.totalAmount = amount;
                 currentEditingBudget.description = description;
+                currentEditingBudget.startMonth = startMonth;
+                currentEditingBudget.durationMonths = durationMonths;
             } else {
                 // Add new budget
                 const newBudget = {
@@ -1177,7 +1280,9 @@
                     year: year,
                     totalAmount: amount,
                     allocatedAmount: 0,
-                    description: description
+                    description: description,
+                    startMonth: startMonth,
+                    durationMonths: durationMonths
                 };
                 budgets.push(newBudget);
             }
@@ -1215,6 +1320,11 @@
                 btn.addEventListener('click', closeBudgetModal);
             });
             
+            // Budget details modal close button
+            document.querySelectorAll('#budgetDetailsModal .btn-close, #budgetDetailsModal .btn-secondary').forEach(btn => {
+                btn.addEventListener('click', closeBudgetDetailsModal);
+            });
+            
             // Budget selection change
             document.getElementById('approval-budget').addEventListener('change', function() {
                 const budgetId = parseInt(this.value);
@@ -1224,6 +1334,96 @@
                     document.getElementById('selected-budget-info').style.display = 'none';
                 }
             });
+        }
+        
+        // Get month name in Thai
+        function getThaiMonthName(monthNumber) {
+            const months = [
+                'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+            ];
+            return months[monthNumber - 1] || '';
+        }
+        
+        // Get budget period string
+        function getBudgetPeriodString(startMonth, durationMonths) {
+            const startMonthName = getThaiMonthName(startMonth);
+            const endMonth = ((startMonth + durationMonths - 1 - 1) % 12) + 1;
+            const endMonthName = getThaiMonthName(endMonth);
+            return `${startMonthName} - ${endMonthName} (${durationMonths} เดือน)`;
+        }
+        
+        // Show budget details modal
+        function showBudgetDetails(budgetId) {
+            const budget = budgets.find(b => b.id === budgetId);
+            if (!budget) return;
+            
+            // Get projects using this budget
+            const budgetProjects = projects.filter(p => p.budgetId === budgetId && p.status === 'approved');
+            
+            // Update modal content
+            document.getElementById('budget-details-title').textContent = budget.name;
+            document.getElementById('budget-details-year').textContent = budget.year;
+            document.getElementById('budget-details-period').textContent = getBudgetPeriodString(budget.startMonth, budget.durationMonths);
+            document.getElementById('budget-details-total').textContent = formatNumber(budget.totalAmount) + ' บาท';
+            document.getElementById('budget-details-allocated').textContent = formatNumber(budget.allocatedAmount) + ' บาท';
+            document.getElementById('budget-details-remaining').textContent = formatNumber(budget.totalAmount - budget.allocatedAmount) + ' บาท';
+            document.getElementById('budget-details-description').textContent = budget.description || 'ไม่มีรายละเอียด';
+            
+            // Render projects list
+            const projectsContainer = document.getElementById('budget-projects-list');
+            if (budgetProjects.length === 0) {
+                projectsContainer.innerHTML = '<p class="text-muted">ยังไม่มีโครงการที่ใช้งบประมาณนี้</p>';
+            } else {
+                projectsContainer.innerHTML = budgetProjects.map(project => `
+                    <div class="card mb-2 border-start border-3 border-success">
+                        <div class="card-body py-2 px-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">${project.projectName}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-hash"></i> ${project.costCenter}
+                                        <span class="mx-2">|</span>
+                                        <i class="bi bi-person"></i> ${project.projectManager}
+                                    </small>
+                                </div>
+                                <span class="badge bg-success">${formatNumber(project.allocatedAmount || 0)} บาท</span>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                <i class="bi bi-calendar3"></i> ${project.startDate} - ${project.endDate}
+                            </small>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Show modal
+            const modalElement = document.getElementById('budgetDetailsModal');
+            modalElement.style.display = 'block';
+            modalElement.classList.add('show');
+            modalElement.setAttribute('aria-hidden', 'false');
+            
+            // Add backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'modal-details-backdrop';
+            document.body.appendChild(backdrop);
+            document.body.classList.add('modal-open');
+        }
+        
+        // Close budget details modal
+        function closeBudgetDetailsModal() {
+            const modalElement = document.getElementById('budgetDetailsModal');
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            modalElement.setAttribute('aria-hidden', 'true');
+            
+            // Remove backdrop
+            const backdrop = document.getElementById('modal-details-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            document.body.classList.remove('modal-open');
         }
 
         // Initialize on page load
