@@ -1,0 +1,365 @@
+<mxfile host="Electron" modified="2025-11-06T05:13:38.333Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="OQxCtF1hh5osFBvcTjyl" version="22.1.2" type="device">
+  <diagram id="cloud_flow_vendor_yesno" name="DevSecOps Governance Process Flow">
+    <mxGraphModel dx="1306" dy="817" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="DevSecOps Governance Process Flow (Application / ITC / Vendor)" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#ffffff;strokeColor=#222222;fontStyle=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="40" y="10" width="2170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="laneApp" value="Application Team" style="swimlane;horizontal=0;startSize=30;fillColor=#e6f0ff;strokeColor=#0066cc;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="60" width="520" height="3070" as="geometry" />
+        </mxCell>
+        <mxCell id="A1" value="1: Project Registration&lt;br&gt;• Profile, Owner, Contacts&lt;br&gt;• Project Size (S/M/L/XL,Custom)&lt;br&gt;• Project Importance (Normal/Critical)" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="40" y="50" width="440" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="A2" value="2: Project Kickoff&lt;br&gt;• purpose, goals &amp;amp; scope (Full ITC, Hybrid, Full Vendor)&lt;br&gt;• Identify Vendor involvement&lt;br&gt;• Confirm RACI" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="40" y="200" width="440" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="D1" value="ข้อมูลครบ?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneApp" vertex="1">
+          <mxGeometry x="80" y="330" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="A3" value="3: Data Classification &amp; Scope&lt;br&gt;• Data type, sensitivity&lt;br&gt;• Integrations, services&lt;br&gt;• Dependencies" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="40" y="550" width="440" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="D2" value="มีข้อมูลอ่อนไหว (PII/Sensitive)?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneApp" vertex="1">
+          <mxGeometry x="170" y="690" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="A4" value="5: ITC Engagement Request&lt;br&gt;• Needs: Arch/IaC/Sec/Monitoring/Consulte" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="40" y="930" width="440" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="D3" value="ต้องการ ITC Support?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneApp" vertex="1">
+          <mxGeometry x="70" y="1050" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="A5" value="7: Architecture &amp; Diagram Upload" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="60" y="1180" width="440" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="D4" value="Diagram ครบถ้วน?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneApp" vertex="1">
+          <mxGeometry x="90" y="1330" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="AFix1" value="แก้ไขข้อมูล Registration" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fde8e8;strokeColor=#c0392b;" parent="laneApp" vertex="1">
+          <mxGeometry x="310" y="335" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="AFix2" value="แก้ไข Diagram และอัปโหลดใหม่" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fde8e8;strokeColor=#c0392b;" parent="laneApp" vertex="1">
+          <mxGeometry x="300" y="1330" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="AFix3" value="แก้ไข Timeline" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fde8e8;strokeColor=#c0392b;" parent="laneApp" vertex="1">
+          <mxGeometry x="50" y="1615" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="A6" value="8: Timeline Planning&lt;br&gt;• Kickoff/Dev/UAT/SecTest/Go-Live" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="50" y="1450" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="D5" value="Timeline ครบถ้วน?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneApp" vertex="1">
+          <mxGeometry x="290" y="1610" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="S0" value="11: Service Registration &amp; Build&lt;br&gt;• Onboard Service / Deploy Container&lt;br&gt;• GitHub CI/CD Setup" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="40" y="1930" width="440" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="S2" value="12: Secure Stage&lt;br&gt;• SAST / DAST / ECR Scan&lt;br&gt;• Policy Gates" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="40" y="2140" width="440" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="S3" value="14: Feedback &amp; Retrospective&lt;br&gt;• Lessons Learned&lt;br&gt;• Submit improvement request" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e6f0ff;strokeColor=#0066cc;" parent="laneApp" vertex="1">
+          <mxGeometry x="40" y="2400" width="440" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="D13" value="มี Incident หรือ Improvement Suggestion หรือไม่?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneApp" vertex="1">
+          <mxGeometry x="160" y="2530" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="SEC_FIX" value="แก้ไข Design/Security Control ตาม Feedback จาก AWS Expert" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fde8e8;strokeColor=#c0392b;" parent="laneApp" vertex="1">
+          <mxGeometry x="280" y="780" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="PvqY5MKEW7i6wqR25aCU-4" value="No" style="edgeStyle=elbowEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneApp" source="PvqY5MKEW7i6wqR25aCU-3" target="A3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PvqY5MKEW7i6wqR25aCU-3" value="สร้าง AWS Account ใหม่" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneApp" vertex="1">
+          <mxGeometry x="190" y="420" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D1_A3" value="Yes" style="entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneApp" source="D1" target="PvqY5MKEW7i6wqR25aCU-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="laneApp" source="S0" target="S2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="laneITC" value="ITC Team" style="swimlane;horizontal=0;startSize=30;fillColor=#e9f9e9;strokeColor=#00994d;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="560" y="60" width="950" height="3070" as="geometry" />
+        </mxCell>
+        <mxCell id="D14" value="Apply Improvement?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneITC" vertex="1">
+          <mxGeometry x="270" y="2795" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="I2" value="6: Assign Cloud Engineer / DevOps Engineer" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="140" y="1020" width="440" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="I3" value="9: ITC Review &amp; Approval&lt;br&gt;• Verify completeness/compliance/cost" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="140" y="1140" width="440" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="D7" value="อนุมัติหรือไม่?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneITC" vertex="1">
+          <mxGeometry x="150" y="1270" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="I4" value="10: Infrastructure Provisioning&lt;br&gt;• AWS baseline (VPC/IAM/Monitoring/IaC)&lt;br&gt;• Infra sizing ตาม Project Size&lt;br&gt;• Create AWS Account / IAM สำหรับ Vendor (ถ้ามี)" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="140" y="1410" width="440" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="I5" value="12A: Validate ISO policy and Cloud First policy applied" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="140" y="1840" width="440" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="I6" value="13: Operate &amp;amp; Secure&lt;br&gt;• Cert Mgmt / Backup / IAM&lt;br&gt;• WAF / Logging / Monitoring Baseline&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;• Health Dashboard / Alerts&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;• Incident Workflow" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="140" y="2110" width="440" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="PH3I1" value="15: ITC Review &amp; Analyze Metrics&lt;br&gt;• DORA, SLA, Cost anomaly, Security trend" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="140" y="2520" width="440" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="PH3I2" value="16: Plan Optimization &amp; Update IaC&lt;br&gt;• Revise templates&lt;br&gt;• Update best practices repo" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="140" y="2640" width="440" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="PH3Loop" value="Continuous Loop → Back to Process 10 (IaC Redeploy / Template Update)" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="235" y="2960" width="250" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Gov" value="Governance &amp;amp; Cost Control&lt;br&gt;• Define Budget, Resource Quota (ตาม Project Size)&lt;br&gt;• Tagging: ProjectName, AppName, Env&lt;br&gt;" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="380" y="1660" width="440" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="SEC_STD_2" value="3A: Standard Security Review (All Projects)&lt;br&gt;ตรวจสอบ Architecture (WAF+CF), IAM, Logging, Encryption, Backup&lt;br&gt;Owner: ITC / CB ?" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="40" y="550" width="440" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SEC_ADV_2" value="4: Advanced Security Review (AWS Security Expert)&lt;br&gt;Scope: Architecture(WAF+CF), IAM, Logging, Encryption, Backup, Cost Analysis,&amp;nbsp;Shield Advanced,Security Hub, Well-Architected, Trusted Advisor&lt;br&gt;Owner: ITC / CB ?/ AWS" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#e9f9e9;strokeColor=#00994d;" parent="laneITC" vertex="1">
+          <mxGeometry x="490" y="550" width="440" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SEC_DECISION" value="ผ่านการ Review จาก AWS Security Expert หรือไม่?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneITC" vertex="1">
+          <mxGeometry x="620" y="850" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="e_I3_D7" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneITC" source="I3" target="D7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D7_I4" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneITC" source="D7" target="I4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D7_IReturn" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneITC" source="D7" target="IReturn" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_I5_D11" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="laneITC" source="I5" target="I6" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="360" y="2060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_I4_Gov" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneITC" source="I4" target="Gov" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_PH3I1_PH3I2" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneITC" source="PH3I1" target="PH3I2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_PH3I2_D14" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="laneITC" source="PH3I2" target="D14" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="255" y="2767.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_D14_PH3Loop" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="laneITC" source="D14" target="PH3Loop" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="306.32653061224437" y="2793.1632653061224" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_I1A_SEC_DECISION" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="laneITC" source="SEC_ADV_2" target="SEC_DECISION" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IReturn" value="ส่งรายการแก้ไขให้ทีม Application/Vendor" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fde8e8;strokeColor=#c0392b;" parent="laneITC" vertex="1">
+          <mxGeometry x="530" y="1270" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="laneVendor" value="Vendor (optional)" style="swimlane;horizontal=0;startSize=30;fillColor=#fff2e6;strokeColor=#ff9900;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="1510" y="60" width="700" height="3070" as="geometry" />
+        </mxCell>
+        <mxCell id="D8" value="มี Vendor หรือไม่?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneVendor" vertex="1">
+          <mxGeometry x="150" y="60" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V1" value="Infra &amp; Network Design Support&#xa;• Assist Architecture" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff2e6;strokeColor=#ff9900;" parent="laneVendor" vertex="1">
+          <mxGeometry x="60" y="280" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="D9" value="Vendor ดูแล AWS Account เองหรือไม่?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneVendor" vertex="1">
+          <mxGeometry x="120" y="560" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="V2" value="Vendor Operation&#xa;• Manage AWS Account&#xa;• Report config &amp; compliance" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff2e6;strokeColor=#ff9900;" parent="laneVendor" vertex="1">
+          <mxGeometry x="60" y="1400" width="360" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="V3" value="Vendor DevSecOps Support (optional)&#xa;• Assist CI/CD / IaC&#xa;• Security Scan execution" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff2e6;strokeColor=#ff9900;" parent="laneVendor" vertex="1">
+          <mxGeometry x="70" y="2025" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="D12" value="Vendor ดูแล AWS Account เองหรือไม่?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff9cc;strokeColor=#b38f00;" parent="laneVendor" vertex="1">
+          <mxGeometry x="140" y="2260" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="laneVendor" source="V4" target="PH3V1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V4" value="Vendor Operate&lt;br&gt;• Manage AWS Account&lt;br&gt;" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff2e6;strokeColor=#ff9900;" parent="laneVendor" vertex="1">
+          <mxGeometry x="70" y="2490" width="360" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="PH3V1" value="Vendor Optimization Support&#xa;• Monthly compliance &amp; cost report&#xa;• Improvement proposal" style="shape=process;whiteSpace=wrap;html=1;rounded=1;fillColor=#fff2e6;strokeColor=#ff9900;" parent="laneVendor" vertex="1">
+          <mxGeometry x="70" y="2630" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="e_A1_A2" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A1" target="A2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_A2_D1" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A2" target="D1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D1_AFix1" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D1" target="AFix1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_AFix1_A2" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="AFix1" target="A2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_A3_D2" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A3" target="D2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D2_I1" value="Yes" style="exitX=1;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A3" target="SEC_STD_2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D2_A4" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D2" target="A4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_I1_A4" value="" style="entryX=0.999;entryY=0.328;entryDx=0;entryDy=0;entryPerimeter=0;edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="SEC_STD_2" target="A4" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="670" y="970" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_A4_D3" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A4" target="D3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D3_I2" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D3" target="I2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="1150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_D3_A5" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D3" target="A5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_I2_A5" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="I2" target="A5" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="1190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_A5_D4" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A5" target="D4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D4_A6" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D4" target="A6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D4_AFix2" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D4" target="AFix2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_A6_D5" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A6" target="D5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D5_AFix3" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D5" target="AFix3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_I4_V2" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="I4" target="V2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_A1_D8" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="A1" target="D8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D8_V1" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D8" target="V1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D8_A2" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D8" target="A2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_V1_D9" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="V1" target="D9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D9_V2" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D9" target="V2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_I4_S0" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="I4" target="S0" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_V3_D12" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="V3" target="D12" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D12_V4" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D12" target="V4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D12_I6" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="D12" target="I6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_S3_D13" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="S3" target="D13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D13_PH3I1" value="Yes" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D13" target="PH3I1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D13_End" value="No" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="D13" target="EndProcess" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="2610" as="sourcePoint" />
+            <mxPoint x="260" y="2680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_D2_I1A" value="Yes (Critical/Sensitive)" style="entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="D2" target="SEC_ADV_2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_SEC_DECISION_A4" value="Yes (Pass)" style="entryX=1;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="SEC_DECISION" target="A4" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="1021" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_SEC_DECISION_SEC_FIX" value="No (Need Fix)" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="SEC_DECISION" target="SEC_FIX" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_SEC_FIX_SEC_ADV_2" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="SEC_FIX" target="SEC_ADV_2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="EndProcess" value="Process Complete" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="2870" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="PvqY5MKEW7i6wqR25aCU-5" style="edgeStyle=elbowEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;elbow=vertical;jumpStyle=gap;rounded=1;" parent="1" source="PvqY5MKEW7i6wqR25aCU-3" target="SEC_STD_2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PvqY5MKEW7i6wqR25aCU-6" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="PvqY5MKEW7i6wqR25aCU-5" vertex="1" connectable="0">
+          <mxGeometry x="-0.7046" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="S2" target="I5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" parent="1" source="I6" target="S3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="D14" target="EndProcess" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-6" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Z0TdxuvkWYg6mYRx55XS-5" vertex="1" connectable="0">
+          <mxGeometry x="-0.3931" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="D5" target="I3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="1710" />
+              <mxPoint x="640" y="1250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-9" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Z0TdxuvkWYg6mYRx55XS-7" vertex="1" connectable="0">
+          <mxGeometry x="-0.9206" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="D9" target="PvqY5MKEW7i6wqR25aCU-3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1610" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z0TdxuvkWYg6mYRx55XS-16" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Z0TdxuvkWYg6mYRx55XS-15" vertex="1" connectable="0">
+          <mxGeometry x="-0.9028" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
